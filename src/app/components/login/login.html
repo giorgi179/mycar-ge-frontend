@@ -1,0 +1,82 @@
+<div class="auth-page">
+
+    <aside class="auth-visual">
+        <div class="auth-visual__logo">MyCar<span>.ge</span></div>
+
+        <div class="auth-visual__content">
+            <h2 class="auth-visual__title">{{ 'auth.visualTitle' | translate }}</h2>
+            <p class="auth-visual__subtitle">
+                {{ 'auth.visualSubtitle' | translate }}
+            </p>
+
+            <div class="auth-visual__stats">
+                <div class="auth-visual__stat">
+                    <strong>12,000+</strong>
+                    <span>{{ 'auth.statListings' | translate }}</span>
+                </div>
+                <div class="auth-visual__stat">
+                    <strong>98%</strong>
+                    <span>{{ 'auth.statSatisfied' | translate }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div></div>
+    </aside>
+
+    <div class="auth-form-side">
+        <div class="auth-card">
+            <div class="auth-card__logo">
+                <span>MyCar.ge</span>
+            </div>
+
+            <p class="auth-card__eyebrow">{{ 'auth.eyebrow' | translate }}</p>
+            <h1 class="auth-card__title">{{ 'auth.loginTitle' | translate }}</h1>
+            <p class="auth-card__lead">{{ 'auth.loginLead' | translate }}</p>
+
+            <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+                <div class="form-field">
+                    <label class="form-field__label">{{ 'auth.email' | translate }} <span
+                            class="form-field__required">*</span></label>
+                    <input class="form-field__input" type="email" formControlName="email"
+                        [placeholder]="'auth.emailPlaceholder' | translate" />
+                    @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                    <p class="error">{{ 'auth.errors.emailInvalid' | translate }}</p>
+                    }
+                </div>
+
+                <div class="form-field">
+                    <label class="form-field__label">{{ 'auth.password' | translate }} <span
+                            class="form-field__required">*</span></label>
+                    <input class="form-field__input" [type]="showPassword ? 'text' : 'password'"
+                        formControlName="password" [placeholder]="'auth.passwordPlaceholder' | translate" />
+                    <button type="button" class="form-field__toggle" (click)="showPassword = !showPassword">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 12C2 12 5.5 5 12 5C18.5 5 22 12 22 12C22 12 18.5 19 12 19C5.5 19 2 12 2 12Z"
+                                stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+                        </svg>
+                    </button>
+                    @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                    <p class="error">{{ 'auth.errors.passwordRequiredLogin' | translate }}</p>
+                    }
+                </div>
+
+                @if (loginError) {
+                <p class="error error--form">{{ loginError | translate }}</p>
+                }
+
+                <button class="auth-form__submit" type="submit" [disabled]="loginForm.invalid">
+                    {{ 'auth.loginButton' | translate }}
+                </button>
+
+            </form>
+
+            <div class="auth-card__footer">
+                {{ 'auth.noAccount' | translate }} <a routerLink="/register">{{ 'auth.registerLink' | translate }}</a>
+            </div>
+        </div>
+    </div>
+
+</div>

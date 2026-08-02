@@ -1,3 +1,5 @@
+
+
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -6,7 +8,9 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { Agent } from 'https';
 
+const httpsAgent = new Agent({ rejectUnauthorized: false });
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();

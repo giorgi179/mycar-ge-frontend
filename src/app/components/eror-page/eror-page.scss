@@ -1,0 +1,244 @@
+:host {
+  display: block;
+}
+
+.error-page {
+  --bg: #0b0b0d;
+  --bg-soft: #17161b;
+  --gold: #c9a227;
+  --gold-light: #e8c766;
+  --ivory: #f5f0e6;
+  --ivory-dim: rgba(245, 240, 230, 0.55);
+  --accent-red: #7a1f1f;
+
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 40%, var(--bg-soft) 0%, var(--bg) 70%);
+  color: var(--ivory);
+  font-family: 'Jost', 'Segoe UI', sans-serif;
+}
+
+// --------------------------------------------------------------------------
+// სცენა
+// --------------------------------------------------------------------------
+
+.error-page__stage {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 0 24px;
+  opacity: 0;
+  animation: stage-in 0.7s ease-out 0.15s forwards;
+}
+
+@keyframes stage-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-page__pinstripe {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+  animation: pinstripe-grow 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
+
+@keyframes pinstripe-grow {
+  to {
+    width: 220px;
+  }
+}
+
+// --------------------------------------------------------------------------
+// 404 კოდი
+// --------------------------------------------------------------------------
+
+.error-page__code {
+  font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+  font-weight: 600;
+  font-size: clamp(3.2rem, 9vw, 5.5rem);
+  letter-spacing: 0.12em;
+  color: var(--gold-light);
+  line-height: 1;
+  opacity: 0;
+  text-shadow: 0 0 24px rgba(201, 162, 39, 0.35);
+  animation: brand-in 0.8s ease-out 0.3s forwards;
+}
+
+@keyframes brand-in {
+  to {
+    opacity: 1;
+  }
+}
+
+// --------------------------------------------------------------------------
+// მანქანის სილუეტი
+// --------------------------------------------------------------------------
+
+.error-page__car {
+  width: clamp(160px, 24vw, 220px);
+  height: auto;
+  color: var(--gold-light);
+  filter: drop-shadow(0 0 14px rgba(201, 162, 39, 0.35));
+}
+
+.error-page__car-path {
+  stroke-dasharray: 620;
+  stroke-dashoffset: 620;
+  animation:
+    draw-car 1.8s cubic-bezier(0.65, 0, 0.35, 1) 0.5s forwards,
+    car-glow 2.4s ease-in-out 2.3s infinite;
+}
+
+@keyframes draw-car {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes car-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(232, 199, 102, 0.25));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(232, 199, 102, 0.65));
+  }
+}
+
+// --------------------------------------------------------------------------
+// ბრენდის ტექსტი
+// --------------------------------------------------------------------------
+
+.error-page__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  animation: brand-in 0.8s ease-out 2.1s forwards;
+}
+
+.error-page__brand-text {
+  font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+  font-weight: 600;
+  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  letter-spacing: 0.36em;
+  text-indent: 0.36em;
+  color: var(--ivory);
+  text-transform: uppercase;
+}
+
+.error-page__brand-line {
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+}
+
+// --------------------------------------------------------------------------
+// ტაგლაინი
+// --------------------------------------------------------------------------
+
+.error-page__tagline {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: var(--ivory-dim);
+  opacity: 0;
+  text-align: center;
+  animation: brand-in 0.8s ease-out 2.3s forwards;
+}
+
+// --------------------------------------------------------------------------
+// ღილაკი
+// --------------------------------------------------------------------------
+
+.error-page__button {
+  margin-top: 8px;
+  padding: 12px 34px;
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: transparent;
+  opacity: 0;
+  transition: background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+  animation: brand-in 0.8s ease-out 2.5s forwards;
+
+  &:hover {
+    background: var(--gold);
+    color: var(--bg);
+    box-shadow: 0 0 20px rgba(201, 162, 39, 0.45);
+  }
+}
+
+// --------------------------------------------------------------------------
+// კარიბჭეები
+// --------------------------------------------------------------------------
+
+.error-page__gate {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: linear-gradient(180deg, #0e0d10, #0b0b0d);
+  z-index: 2;
+}
+
+.error-page__gate--left {
+  left: 0;
+  border-right: 1px solid rgba(201, 162, 39, 0.3);
+}
+
+.error-page__gate--right {
+  right: 0;
+  border-left: 1px solid rgba(201, 162, 39, 0.3);
+}
+
+// --------------------------------------------------------------------------
+// წვდომადობა
+// --------------------------------------------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  .error-page__stage,
+  .error-page__pinstripe,
+  .error-page__code,
+  .error-page__car-path,
+  .error-page__brand,
+  .error-page__tagline,
+  .error-page__button {
+    animation: none !important;
+  }
+
+  .error-page__stage,
+  .error-page__code,
+  .error-page__brand,
+  .error-page__tagline,
+  .error-page__button {
+    opacity: 1;
+  }
+
+  .error-page__car-path {
+    stroke-dashoffset: 0;
+  }
+
+  .error-page__pinstripe {
+    width: 220px;
+  }
+}

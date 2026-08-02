@@ -1,12 +1,17 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideAppInitializer, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
-
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
-import { provideClientHydration } from '@angular/platform-browser';
+import { LanguageService } from './services/language-service';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideRouter(routes), provideClientHydration()
+    provideRouter(routes),
+    provideHttpClient(withFetch()),
+    provideAppInitializer(() => {
+      const langService = inject(LanguageService);
+      return langService.init();
+    })
   ]
 };

@@ -1,0 +1,202 @@
+@if (isOpen) {
+<div class="additional-filters__backdrop" (click)="onBackdropClick($event)">
+  <div class="additional-filters">
+
+    <div class="additional-filters__header">
+      <h2>{{ 'filter.additionalFilters' | translate }}</h2>
+      <button type="button" class="additional-filters__close" (click)="onClose()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="additional-filters__body">
+
+      <!-- Vehicle Information -->
+      <section class="additional-filters__section">
+        <h3>{{ 'filter.vehicleInformation' | translate }}</h3>
+
+        <div class="additional-filters__field-row">
+          <span class="additional-filters__field-label">{{ 'filter.transmission' | translate }}</span>
+          <div class="additional-filters__pill-group">
+            @for (t of transmissionList; track t) {
+            <button type="button" class="additional-filters__pill"
+              [class.additional-filters__pill--active]="transmission() === t"
+              (click)="selectTransmission(t)">{{ t }}</button>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Additional features -->
+      <section class="additional-filters__section">
+        <h3>{{ 'filter.additionalFeatures' | translate }}</h3>
+
+        <div class="additional-filters__field-row">
+          <span class="additional-filters__field-label">{{ 'filter.wheel' | translate }}</span>
+          <div class="additional-filters__pill-group">
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="steeringWheel() === 'მარცხენა'" (click)="selectSteeringWheel('მარცხენა')">{{ 'filter.left' | translate }}</button>
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="steeringWheel() === 'მარჯვენა'" (click)="selectSteeringWheel('მარჯვენა')">{{ 'filter.right' | translate }}</button>
+          </div>
+        </div>
+
+        <div class="additional-filters__field-row">
+          <span class="additional-filters__field-label">{{ 'filter.driveWheels' | translate }}</span>
+          <div class="additional-filters__pill-group">
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="driveType() === 'წინა'" (click)="selectDriveType('წინა')">{{ 'filter.front' | translate }}</button>
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="driveType() === 'უკანა'" (click)="selectDriveType('უკანა')">{{ 'filter.rear' | translate }}</button>
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="driveType() === '4x4'" (click)="selectDriveType('4x4')">4x4</button>
+          </div>
+        </div>
+
+        <div class="additional-filters__field-row">
+          <span class="additional-filters__field-label">{{ 'filter.numberOfDoors' | translate }}</span>
+          <div class="additional-filters__pill-group">
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="doors() === '2/3'" (click)="selectDoors('2/3')">2/3</button>
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="doors() === '4/5'" (click)="selectDoors('4/5')">4/5</button>
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="doors() === '>5'" (click)="selectDoors('>5')">&gt;5</button>
+          </div>
+        </div>
+
+        <div class="additional-filters__field-row">
+          <span class="additional-filters__field-label">{{ 'filter.cylinders' | translate }}</span>
+          <div class="additional-filters__pill-group">
+            @for (c of cylindersList; track c) {
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="cylinders() === c" (click)="selectCylinders(c)">{{ c }}</button>
+            }
+          </div>
+        </div>
+
+        <div class="additional-filters__field-row">
+          <span class="additional-filters__field-label">{{ 'filter.airbags' | translate }}</span>
+          <div class="additional-filters__pill-group">
+            @for (a of airbagsList; track a) {
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="airbags() === a" (click)="selectAirbags(a)">{{ a }}</button>
+            }
+          </div>
+        </div>
+
+        <div class="additional-filters__field-row">
+          <span class="additional-filters__field-label">{{ 'filter.techInspection' | translate }}</span>
+          <div class="additional-filters__pill-group">
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="hasTechInspection() === true" (click)="selectTechInspection(true)">{{ 'filter.yes' | translate }}</button>
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="hasTechInspection() === false" (click)="selectTechInspection(false)">{{ 'filter.no' | translate }}</button>
+          </div>
+        </div>
+
+        <div class="additional-filters__field-row">
+          <span class="additional-filters__field-label">{{ 'filter.catalyst' | translate }}</span>
+          <div class="additional-filters__pill-group">
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="hasCatalyst() === true" (click)="selectCatalyst(true)">{{ 'filter.yes' | translate }}</button>
+            <button type="button" class="additional-filters__pill" [class.additional-filters__pill--active]="hasCatalyst() === false" (click)="selectCatalyst(false)">{{ 'filter.no' | translate }}</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Car Color -->
+      <section class="additional-filters__section">
+        <h3>{{ 'filter.carColor' | translate }}</h3>
+        <p class="additional-filters__hint">{{ 'filter.selectSeveral' | translate }}</p>
+
+        <div class="additional-filters__checkbox-grid">
+          <label class="additional-filters__checkbox">
+            <input type="checkbox" (change)="toggleCarColor('all')" />
+            <span class="additional-filters__checkbox-box"></span>
+            <span class="additional-filters__color-swatch additional-filters__color-swatch--rainbow"></span>
+            {{ 'filter.all' | translate }}
+          </label>
+
+          @for (color of carColorList; track color) {
+          <label class="additional-filters__checkbox">
+            <input type="checkbox" [checked]="selectedCarColors().has(color)" (change)="toggleCarColor(color)" />
+            <span class="additional-filters__checkbox-box"></span>
+            <span class="additional-filters__color-swatch"></span>
+            {{ color }}
+          </label>
+          }
+
+          @if (showOtherCarColors()) {
+          @for (color of otherCarColors; track color) {
+          <label class="additional-filters__checkbox">
+            <input type="checkbox" [checked]="selectedCarColors().has(color)" (change)="toggleCarColor(color)" />
+            <span class="additional-filters__checkbox-box"></span>
+            <span class="additional-filters__color-swatch"></span>
+            {{ color }}
+          </label>
+          }
+          }
+        </div>
+
+        <button type="button" class="additional-filters__see-more" (click)="toggleShowOtherCarColors()">
+          {{ 'filter.otherColors' | translate }}
+          <svg width="12" height="12" viewBox="0 0 12 12" [class.additional-filters__chevron--up]="showOtherCarColors()">
+            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </section>
+
+      <!-- Interior material / color -->
+      <section class="additional-filters__section">
+        <h3>{{ 'filter.interiorMaterialColor' | translate }}</h3>
+
+        <div class="additional-filters__checkbox-grid">
+          @for (m of interiorMaterialList; track m) {
+          <label class="additional-filters__checkbox">
+            <input type="checkbox" [checked]="selectedInteriorMaterial().has(m)" (change)="toggleInteriorMaterial(m)" />
+            <span class="additional-filters__checkbox-box"></span>
+            <span>{{ m }}</span>
+          </label>
+          }
+        </div>
+
+        <div class="additional-filters__checkbox-grid additional-filters__checkbox-grid--top-spaced">
+          <label class="additional-filters__checkbox">
+            <input type="checkbox" (change)="toggleInteriorColor('all')" />
+            <span class="additional-filters__checkbox-box"></span>
+            <span class="additional-filters__color-swatch additional-filters__color-swatch--rainbow"></span>
+            {{ 'filter.all' | translate }}
+          </label>
+
+          @for (color of interiorColorList; track color) {
+          <label class="additional-filters__checkbox">
+            <input type="checkbox" [checked]="selectedInteriorColors().has(color)" (change)="toggleInteriorColor(color)" />
+            <span class="additional-filters__checkbox-box"></span>
+            <span class="additional-filters__color-swatch"></span>
+            {{ color }}
+          </label>
+          }
+        </div>
+      </section>
+
+      <!-- Exchange -->
+      <section class="additional-filters__section">
+        <h3>{{ 'filter.informationAboutListing' | translate }}</h3>
+
+        <div class="additional-filters__toggle-row">
+          <span>{{ 'filter.exchange' | translate }}</span>
+          <button type="button" class="additional-filters__switch" [class.additional-filters__switch--on]="isExchangePossible()" (click)="toggleExchange()">
+            <span class="additional-filters__switch-knob"></span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="additional-filters__footer">
+      <button type="button" class="additional-filters__clear" (click)="onClearFilters()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 4h12M6.5 4V2.5a1 1 0 011-1h1a1 1 0 011 1V4M3.5 4l.6 8.4a1.5 1.5 0 001.5 1.6h4.8a1.5 1.5 0 001.5-1.6L12.5 4"
+            stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        {{ 'filter.clearFilters' | translate }}
+      </button>
+
+      <button type="button" class="additional-filters__choose" (click)="onChoose()">
+        {{ 'filter.choose' | translate }}
+      </button>
+    </div>
+
+  </div>
+</div>
+}

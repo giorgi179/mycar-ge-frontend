@@ -1,0 +1,23 @@
+<app-home-filtre [cars]="carList()" [totalCount]="filteredCars().length" (filterChange)="onFilterChange($event)"
+    (clearFilters)="onClearFilters()">
+</app-home-filtre>
+
+@if (error()) {
+<p>{{ error() }}</p>
+}@else {
+<div class="car-list">
+
+    @for (car of filteredCars(); track car.id) {
+    <div class="car-card">
+        <img [src]="car.carImg" [alt]="car.carModel" />
+        <h3>{{ car.carModel }}</h3>
+        <p>{{ car.city }}</p>
+        <p>{{ car.carPrice }} ₾</p>
+        <p>{{ car.carType }} · {{ car.fuelType }} · {{ car.carAge }}</p>
+    </div>
+    } @empty {
+    <p>{{ 'home.noResults' | translate }}</p>
+    }
+
+</div>
+}

@@ -1,0 +1,80 @@
+<header class="header">
+    <div class="header__left">
+        <a routerLink="/" class="header__logo">
+            <img src="mycar_logo (2).svg" [attr.alt]="'nav.home' | translate" />
+        </a>
+        <div class="header__search">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="7" cy="7" r="5.5" stroke="#B0B0B0" stroke-width="1.3" />
+                <path d="M11.5 11.5L14.5 14.5" stroke="#B0B0B0" stroke-width="1.3" stroke-linecap="round" />
+            </svg>
+            <input type="search" [placeholder]="'common.search' | translate" (input)="onSearchInput($event)" />
+        </div>
+    </div>
+
+    <button class="header__burger" [class.is-active]="isMenuOpen" type="button"
+        [attr.aria-label]="'common.menu' | translate" (click)="toggleMenu()">
+        <span></span>
+    </button>
+
+    <div class="header__overlay" [class.is-open]="isMenuOpen" (click)="closeMenu()"></div>
+
+    <div class="header__right" [class.is-open]="isMenuOpen">
+        <div class="header__add-wrap">
+            <a class="header__add" (click)="onAddListingClick($event)">
+                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M8.8108 16C13.2238 16 16.8013 12.4183 16.8013 8C16.8013 3.58172 13.2238 0 8.8108 0C4.39778 0 0.820312 3.58172 0.820312 8C0.820312 12.4183 4.39778 16 8.8108 16Z"
+                        fill="#FD4100"></path>
+                    <path
+                        d="M9.81012 5C9.81012 4.44772 9.36294 4 8.81131 4C8.25968 4 7.8125 4.44772 7.8125 5V11C7.8125 11.5523 8.25968 12 8.81131 12C9.36294 12 9.81012 11.5523 9.81012 11V5Z"
+                        fill="white"></path>
+                    <path
+                        d="M5.81522 7C5.26359 7 4.81641 7.44772 4.81641 8C4.81641 8.55228 5.26359 9 5.81522 9H11.8081C12.3597 9 12.8069 8.55228 12.8069 8C12.8069 7.44772 12.3597 7 11.8081 7H5.81522Z"
+                        fill="white"></path>
+                </svg>
+                <span>{{ 'footer.addListing' | translate }}</span>
+            </a>
+
+            @if (showAuthPrompt()) {
+            <div class="header__add-popover">
+                <button type="button" class="header__add-popover-close" (click)="closeAuthPrompt()"
+                    aria-label="Close">×</button>
+                <span class="header__add-popover-eyebrow">{{ 'auth.eyebrow' | translate }}</span>
+                <p class="header__add-popover-text">{{ 'auth.loginLead' | translate }}</p>
+                <div class="header__add-popover-actions">
+                    <a routerLink="/auth" class="header__add-popover-btn header__add-popover-btn--primary"
+                        (click)="closeAuthPrompt(); closeMenu()">
+                        {{ 'nav.login' | translate }}
+                    </a>
+                    <a routerLink="/register" class="header__add-popover-btn" (click)="closeAuthPrompt(); closeMenu()">
+                        {{ 'nav.register' | translate }}
+                    </a>
+                </div>
+            </div>
+            }
+        </div>
+
+        <app-language-selector></app-language-selector>
+        @if (auth.isLoggedIn()) {
+        <a href="" class="header__login" (click)="closeMenu()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="8" cy="5" r="2.5" stroke="#1A1A1A" stroke-width="1.2" />
+                <path d="M3 13.5C3.5 10.8 5.5 9.5 8 9.5C10.5 9.5 12.5 10.8 13 13.5" stroke="#1A1A1A" stroke-width="1.2"
+                    stroke-linecap="round" />
+            </svg>
+            <span>{{ 'nav.logout' | translate }}</span>
+        </a>
+        }@else {
+        <a routerLink="/auth" class="header__login" (click)="closeMenu()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="8" cy="5" r="2.5" stroke="#1A1A1A" stroke-width="1.2" />
+                <path d="M3 13.5C3.5 10.8 5.5 9.5 8 9.5C10.5 9.5 12.5 10.8 13 13.5" stroke="#1A1A1A" stroke-width="1.2"
+                    stroke-linecap="round" />
+            </svg>
+            <span>{{ 'nav.login' | translate }}</span>
+        </a>
+        }
+
+    </div>
+</header>

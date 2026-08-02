@@ -1,0 +1,169 @@
+<div class="auth-page">
+
+    <aside class="auth-visual">
+        <div class="auth-visual__logo">MyCar<span>.ge</span></div>
+
+        <div class="auth-visual__content">
+            <h2 class="auth-visual__title">{{ 'auth.visualTitle' | translate }}</h2>
+            <p class="auth-visual__subtitle">
+                {{ 'auth.visualSubtitle' | translate }}
+            </p>
+
+            <div class="auth-visual__stats">
+                <div class="auth-visual__stat">
+                    <strong>12,000+</strong>
+                    <span>{{ 'auth.statListings' | translate }}</span>
+                </div>
+                <div class="auth-visual__stat">
+                    <strong>98%</strong>
+                    <span>{{ 'auth.statSatisfied' | translate }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div></div>
+    </aside>
+
+    <div class="auth-form-side">
+        <div class="auth-card">
+            <div class="auth-card__logo">
+                <span>MyCar.ge</span>
+            </div>
+
+            @if (!showReRandomCode) {
+            <p class="auth-card__eyebrow">{{ 'auth.eyebrow' | translate }}</p>
+            <h1 class="auth-card__title">{{ 'auth.registerTitle' | translate }}</h1>
+            <p class="auth-card__lead">{{ 'auth.lead' | translate }}</p>
+
+            <form class="auth-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-field__label">{{ 'auth.firstName' | translate }} <span
+                                class="form-field__required">*</span></label>
+                        <input class="form-field__input" type="text" formControlName="firstName"
+                            [placeholder]="'auth.firstNamePlaceholder' | translate" />
+                        @if (registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched) {
+                        <p class="error">{{ 'auth.errors.firstNameRequired' | translate }}</p>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-field__label">{{ 'auth.lastName' | translate }} <span
+                                class="form-field__required">*</span></label>
+                        <input class="form-field__input" type="text" formControlName="lastName"
+                            [placeholder]="'auth.lastNamePlaceholder' | translate" />
+                        @if (registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched) {
+                        <p class="error">{{ 'auth.errors.lastNameRequired' | translate }}</p>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="form-field__label">{{ 'auth.email' | translate }} <span
+                            class="form-field__required">*</span></label>
+                    <input class="form-field__input" type="email" formControlName="email"
+                        [placeholder]="'auth.emailPlaceholder' | translate" />
+                    @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                    <p class="error">{{ 'auth.errors.emailInvalid' | translate }}</p>
+                    }
+                </div>
+
+                <div class="form-field">
+                    <label class="form-field__label">{{ 'auth.password' | translate }} <span
+                            class="form-field__required">*</span></label>
+                    <input class="form-field__input" [type]="showPassword ? 'text' : 'password'"
+                        formControlName="password" [placeholder]="'auth.passwordPlaceholder' | translate" />
+                    <button type="button" class="form-field__toggle" (click)="showPassword = !showPassword">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 12C2 12 5.5 5 12 5C18.5 5 22 12 22 12C22 12 18.5 19 12 19C5.5 19 2 12 2 12Z"
+                                stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+                        </svg>
+                    </button>
+                    @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+                    <p class="error">{{ 'auth.errors.passwordMinLength' | translate }}</p>
+                    }
+                </div>
+
+                <div class="form-field">
+                    <label class="form-field__label">{{ 'auth.reEnterPassword' | translate }} <span
+                            class="form-field__required">*</span></label>
+                    <input class="form-field__input" [type]="showRePassword ? 'text' : 'password'"
+                        formControlName="reEnterPassword"
+                        [placeholder]="'auth.reEnterPasswordPlaceholder' | translate" />
+                    <button type="button" class="form-field__toggle" (click)="showRePassword = !showRePassword">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 12C2 12 5.5 5 12 5C18.5 5 22 12 22 12C22 12 18.5 19 12 19C5.5 19 2 12 2 12Z"
+                                stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+                        </svg>
+                    </button>
+                    @if (registerForm.get('reEnterPassword')?.invalid && registerForm.get('reEnterPassword')?.touched) {
+                    <p class="error">{{ 'auth.errors.passwordRequired' | translate }}</p>
+                    }
+                </div>
+
+                <div class="form-field">
+                    <label class="form-field__label">{{ 'auth.profilePhoto' | translate }}</label>
+                    <label class="form-field__file">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M4 7H7.5L9 4.5H15L16.5 7H20C20.5523 7 21 7.44772 21 8V19C21 19.5523 20.5523 20 20 20H4C3.44772 20 3 19.5523 3 19V8C3 7.44772 3.44772 7 4 7Z"
+                                stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                            <circle cx="12" cy="13" r="3.5" stroke="currentColor" stroke-width="1.6" />
+                        </svg>
+                        {{ 'auth.profilePhoto' | translate }}
+                        <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+                    </label>
+                </div>
+
+                @if (registerError) {
+                <p class="error error--form">{{ registerError | translate }}</p>
+                }
+
+                <button class="auth-form__submit" type="submit" [disabled]="registerForm.invalid">
+                    {{ 'auth.registerButton' | translate }}
+                </button>
+
+            </form>
+
+            <div class="auth-card__footer">
+                {{ 'auth.haveAccount' | translate }} <a routerLink="/auth">{{ 'auth.loginLink' | translate }}</a>
+            </div>
+            } @else {
+            <button type="button" class="back-btn" (click)="back()">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                    <path
+                        d="M73.4 297.4C60.9 309.9 60.9 330.2 73.4 342.7L233.4 502.7C245.9 515.2 266.2 515.2 278.7 502.7C291.2 490.2 291.2 469.9 278.7 457.4L173.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L173.3 288L278.7 182.6C291.2 170.1 291.2 149.8 278.7 137.3C266.2 124.8 245.9 124.8 233.4 137.3L73.4 297.3z"
+                        fill="currentColor" />
+                </svg>
+            </button>
+            <p class="auth-card__eyebrow">{{ 'auth.verifyEyebrow' | translate }}</p>
+            <h1 class="auth-card__title">{{ 'auth.verifyTitle' | translate }}</h1>
+            <p class="auth-card__lead">{{ 'auth.verifyLead' | translate }}</p>
+
+            <form class="auth-form" [formGroup]="verifyForm" (ngSubmit)="onVerify()">
+                <div class="form-field">
+                    <label class="form-field__label">{{ 'auth.verificationCode' | translate }} <span
+                            class="form-field__required">*</span></label>
+                    <input class="form-field__input" type="text" formControlName="verificationCode"
+                        [placeholder]="'auth.verificationCodePlaceholder' | translate" maxlength="6" />
+                    @if (verifyForm.get('verificationCode')?.invalid && verifyForm.get('verificationCode')?.touched)
+                    {
+                    <p class="error">{{ 'auth.errors.verificationCodeRequired' | translate }}</p>
+                    }
+                    @if (verifyError) {
+                    <p class="error">{{ verifyError | translate }}</p>
+                    }
+                </div>
+
+                <button class="auth-form__submit" type="submit" [disabled]="verifyForm.invalid">
+                    {{ 'auth.verifyButton' | translate }}
+                </button>
+            </form>
+            }
+        </div>
+    </div>
+
+</div>
