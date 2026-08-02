@@ -70,39 +70,6 @@
   }
 }
 
-// error / empty state
-p.car-list-message,
-.car-list ~ p {
-  text-align: center;
-  padding: 40px 0;
-  color: var(--text-muted);
-  font-size: 14px;
-}
-
-button {
-  &[type="button"] {
-    display: block;
-    margin: 8px auto 32px;
-    padding: 12px 34px;
-    background-color: var(--ink);
-    border: none;
-    border-radius: 3px;
-    color: var(--accent);
-    font-family: 'Barlow Condensed', 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-
-    &:hover {
-      background-color: var(--accent);
-      color: var(--ink);
-    }
-  }
-}
-
 @media (max-width: 600px) {
   .car-list {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

@@ -19,7 +19,7 @@
   box-shadow: 0 1px 3px rgba(15, 27, 20, 0.06);
   font-family: 'Inter', -apple-system, sans-serif;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; ← ამოშალე ეს ხაზი, დროფდაუნებს ჭრიდა */
 
   &__top {
     display: flex;
@@ -28,27 +28,8 @@
     padding: 18px 24px;
     background-color: var(--ink);
     border-bottom: 3px solid var(--accent);
-  }
-
-  &__title {
-    margin: 0;
-    font-family: 'Barlow Condensed', 'Inter', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #ffffff;
-
-    &::before {
-      content: '';
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background-color: var(--accent);
-      margin-right: 10px;
-      transform: rotate(45deg);
-      vertical-align: middle;
-    }
+    border-radius: 4px 4px 0 0;
+    /* ← დაემატა, კუთხეების მომრგვალებას __top თვითონ აიღებს */
   }
 
   &__clear {
@@ -160,7 +141,7 @@
     top: calc(100% + 6px);
     left: 0;
     right: 0;
-    z-index: 40;
+    z-index: 100;
     max-height: 240px;
     overflow-y: auto;
     background-color: #ffffff;

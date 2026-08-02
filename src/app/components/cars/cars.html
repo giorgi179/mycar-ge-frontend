@@ -1,4 +1,4 @@
-<app-home-filtre [cars]="carList()" [totalCount]="carList().length" (filterChange)="onFilterChange($event)"
+<app-home-filtre [cars]="carList()" [totalCount]="filteredCars().length" (filterChange)="onFilterChange($event)"
     (clearFilters)="onClearFilters()">
 </app-home-filtre>
 
@@ -7,7 +7,7 @@
 } @else {
 <div class="car-list">
 
-    @for (car of limitedCars(); track car.id) {
+    @for (car of filteredCars(); track car.id) {
     <div class="car-card" (click)="goToCarDetails(car.id)">
         <img [src]="car.carImg" [alt]="car.carModel" />
         <h3>{{ car.carModel }}</h3>
@@ -20,6 +20,4 @@
     }
 
 </div>
-
-
 }
