@@ -9,7 +9,7 @@
 
     @for (car of limitedCars(); track car.id) {
     <div class="car-card" (click)="goToCarDetails(car.id)">
-        <img [src]="car.carImg" [alt]="car.carModel" />
+        <img [src]="'https://localhost:7035' + car.carImg" [alt]="car.carModel" />
         <h3>{{ car.carModel }}</h3>
         <p>{{ car.city }}</p>
         <p>{{ car.carPrice }} ₾</p>

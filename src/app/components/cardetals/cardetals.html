@@ -14,9 +14,18 @@
   </button>
 
   <div class="cardetals__hero">
-    <img [src]="c.carImg" [alt]="c.carModel" />
+    <img [src]="'https://localhost:7035' + c.carImg" [alt]="c.carModel" />
   </div>
+<div class="gallery">
 
+@for(image of c.images; track image.id)
+{
+    <img 
+    [src]="'https://localhost:7035' + image.imageUrl"
+    [alt]="c.carModel">
+}
+
+</div>
   <div class="cardetals__body">
 
     <div class="cardetals__header">
@@ -85,22 +94,26 @@
 
       <div class="cardetals__item">
         <span class="cardetals__label">{{ 'filter.interiorMaterialColor' | translate }}</span>
-        <span class="cardetals__value">{{ c.carDetals?.interiorMaterial || '—' }} / {{ c.carDetals?.interiorColor || '—' }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.interiorMaterial || '—' }} / {{ c.carDetals?.interiorColor || '—'
+          }}</span>
       </div>
 
       <div class="cardetals__item">
         <span class="cardetals__label">{{ 'filter.techInspection' | translate }}</span>
-        <span class="cardetals__value">{{ c.carDetals?.hasTechInspection ? ('filter.yes' | translate) : ('filter.no' | translate) }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.hasTechInspection ? ('filter.yes' | translate) : ('filter.no' |
+          translate) }}</span>
       </div>
 
       <div class="cardetals__item">
         <span class="cardetals__label">{{ 'filter.catalyst' | translate }}</span>
-        <span class="cardetals__value">{{ c.carDetals?.hasCatalyst ? ('filter.yes' | translate) : ('filter.no' | translate) }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.hasCatalyst ? ('filter.yes' | translate) : ('filter.no' |
+          translate) }}</span>
       </div>
 
       <div class="cardetals__item">
         <span class="cardetals__label">{{ 'filter.exchange' | translate }}</span>
-        <span class="cardetals__value">{{ c.carDetals?.isExchangePossible ? ('filter.yes' | translate) : ('filter.no' | translate) }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.isExchangePossible ? ('filter.yes' | translate) : ('filter.no' |
+          translate) }}</span>
       </div>
 
       @if (c.carDetals?.vinCode) {

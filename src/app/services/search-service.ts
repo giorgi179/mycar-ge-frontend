@@ -1,10 +1,19 @@
 import { Injectable, signal } from '@angular/core';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class SearchService {
+
   searchTerm = signal<string>('');
 
-  setSearchTerm(term: string): void {
-    this.searchTerm.set(term);
+  setSearchTerm(value: string): void {
+    this.searchTerm.set(value);
   }
+
+
+  clearSearch(): void {
+    this.searchTerm.set('');
+  }
+
 }

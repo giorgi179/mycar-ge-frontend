@@ -3,7 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HomeService } from '../../services/home-service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language-service';
-import { CarListItem } from '../home-filtre/home-filtre';
+import { CarModels } from '../../services/components';
+
 
 @Component({
   selector: 'app-cardetals',
@@ -19,7 +20,7 @@ export class Cardetals implements OnInit {
   private api = inject(HomeService);
   private langService = inject(LanguageService);
 
-  car = signal<CarListItem | null>(null);
+  car = signal<CarModels | null>(null);
   error = signal<string | null>(null);
   loading = signal<boolean>(true);
 
@@ -52,4 +53,5 @@ export class Cardetals implements OnInit {
   goBack(): void {
     this.router.navigate(['/cars']);
   }
+  
 }

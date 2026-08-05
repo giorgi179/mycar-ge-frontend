@@ -27,15 +27,67 @@ export interface CarDetails {
 }
 
 export interface CarListItem {
-  id: number;
-  carImg: string;
-  city: string;
-  carAge: string;
-  carModel: string;
-  carPrice: number;
-  carType: string;
-  fuelType: string;
-  carDetals: CarDetails | null;
+
+  id:number;
+
+  city:string;
+
+  carAge:string;
+
+  carModel:string;
+
+  carPrice:number;
+
+  carType:string;
+
+  fuelType:string;
+
+  carImg:string;
+
+
+  images:{
+    id:number;
+    imageUrl:string;
+  }[];
+
+
+  carDetals:{
+    manufacturer:string;
+    mileage:string;
+    engineVolume:string;
+
+    cylinders:number;
+
+    transmission:string;
+    driveType:string;
+    doors:string;
+
+    airbags:number;
+
+    steeringWheel:string;
+
+    color:string;
+
+    interiorColor:string;
+
+    interiorMaterial:string;
+
+
+    isExchangePossible:boolean;
+
+    hasTechInspection:boolean;
+
+    hasCatalyst:boolean;
+
+
+    description:string;
+
+    userPhone:string;
+
+    vinCode:string;
+
+  } | null;
+
 }
 
 export interface FilterCriteria {

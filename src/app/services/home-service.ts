@@ -14,8 +14,12 @@ export class HomeService {
 
     private api = environment.apiUrl;
 
-    getAllCar(): Observable<CarModels[]> {
-        return this.http.get<CarModels[]>(`${this.api}/Car/get-all-car`);
+    getAllCar(): Observable<CarListItem[]> {
+
+        return this.http.get<CarListItem[]>(
+            `${this.api}/Car/get-all-car`
+        );
+
     }
 
     searchCars(searchTerm: string): Observable<CarModels[]> {
@@ -23,7 +27,9 @@ export class HomeService {
         return this.http.get<CarModels[]>(`${this.api}/Car/get-car-search`, { params: httpParams });
     }
 
-    getCarById(id: number): Observable<CarListItem> {
-        return this.http.get<CarListItem>(`${this.api}/Car/get-car-id/${id}`);
+    getCarById(id: number): Observable<CarModels> {
+        return this.http.get<CarModels>(
+            `${this.api}/Car/get-car-id/${id}`
+        );
     }
 }
