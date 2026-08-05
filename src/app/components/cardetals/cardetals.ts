@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HomeService } from '../../services/home-service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -24,6 +24,10 @@ export class Cardetals implements OnInit {
   error = signal<string | null>(null);
   loading = signal<boolean>(true);
 
+  // გალერეის სთეითი
+  activeIndex = signal<number>(0);
+  activeImage = signal<string>('');
+
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (!idParam) {
@@ -40,6 +44,8 @@ export class Cardetals implements OnInit {
     this.api.getCarById(id).subscribe({
       next: (data) => {
         this.car.set(data);
+        this.activeIndex.set(0);
+        this.activeImage.set(data.carImg);
         this.loading.set(false);
       },
       error: (err) => {
@@ -50,8 +56,31 @@ export class Cardetals implements OnInit {
     });
   }
 
+  setActiveImage(index: number, url: string): void {
+    this.activeIndex.set(index);
+    this.activeImage.set(url);
+  }
+
+  nextImage(): void {
+    const c = this.car();
+    if (!c) return;
+    const total = 1 + (c.images?.length ?? 0);
+    const next = (this.activeIndex() + 1) % total;
+    const url = next === 0 ? c.carImg : c.images[next - 1].imageUrl;
+    this.setActiveImage(next, url);
+  }
+
+  prevImage(): void {
+    const c = this.car();
+    if (!c) return;
+    const total = 1 + (c.images?.length ?? 0);
+    const prev = (this.activeIndex() - 1 + total) % total;
+    const url = prev === 0 ? c.carImg : c.images[prev - 1].imageUrl;
+    this.setActiveImage(prev, url);
+  }
+
   goBack(): void {
     this.router.navigate(['/cars']);
   }
-  
+
 }

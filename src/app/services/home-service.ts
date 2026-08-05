@@ -6,6 +6,17 @@ import { CarModels } from './components';
 
 import { CarListItem } from '../components/home-filtre/home-filtre';
 
+export interface ManufacturerCount {
+    name: string;
+    count: number;
+}
+
+export interface HomeStats {
+    totalCars: number;
+    totalCities: number;
+    totalBrands: number;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -15,11 +26,9 @@ export class HomeService {
     private api = environment.apiUrl;
 
     getAllCar(): Observable<CarListItem[]> {
-
         return this.http.get<CarListItem[]>(
             `${this.api}/Car/get-all-car`
         );
-
     }
 
     searchCars(searchTerm: string): Observable<CarModels[]> {
@@ -30,6 +39,18 @@ export class HomeService {
     getCarById(id: number): Observable<CarModels> {
         return this.http.get<CarModels>(
             `${this.api}/Car/get-car-id/${id}`
+        );
+    }
+
+    getManufacturers(): Observable<ManufacturerCount[]> {
+        return this.http.get<ManufacturerCount[]>(
+            `${this.api}/Car/get-manufacturers`
+        );
+    }
+
+    getStats(): Observable<HomeStats> {
+        return this.http.get<HomeStats>(
+            `${this.api}/Car/get-stats`
         );
     }
 }

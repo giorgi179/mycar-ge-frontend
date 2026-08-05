@@ -1,25 +1,174 @@
-<app-home-filtre [cars]="carList()" [totalCount]="carList().length" (filterChange)="onFilterChange($event)"
-    (clearFilters)="onClearFilters()">
+<section class="home-hero">
+    <div class="home-hero__content">
+        <span class="home-hero__eyebrow">{{ 'home.heroEyebrow' | translate }}</span>
+        <h1 class="home-hero__title">{{ 'home.heroTitle' | translate }}</h1>
+        <p class="home-hero__subtitle">{{ 'home.heroSubtitle' | translate }}</p>
+    </div>
+</section>
+
+<app-home-filtre #homeFiltre [cars]="carList()" [totalCount]="carList().length"
+    (filterChange)="onFilterChange($event)" (clearFilters)="onClearFilters()">
 </app-home-filtre>
 
-@if (error()) {
-<p>{{ error() }}</p>
-} @else {
-<div class="car-list">
+<section class="home-section">
 
-    @for (car of limitedCars(); track car.id) {
-    <div class="car-card" (click)="goToCarDetails(car.id)">
-        <img [src]="'https://localhost:7035' + car.carImg" [alt]="car.carModel" />
-        <h3>{{ car.carModel }}</h3>
-        <p>{{ car.city }}</p>
-        <p>{{ car.carPrice }} ₾</p>
-        <p>{{ car.carType }} · {{ car.fuelType }} · {{ car.carAge }}</p>
+    <div class="home-section__header reveal">
+        <h2>{{ 'home.latestListings' | translate }}</h2>
+        <button type="button" class="home-section__viewall" (click)="goToAllCars()">
+            {{ 'home.viewAll' | translate }}
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </button>
     </div>
-    } @empty {
-    <p>{{ 'home.noResults' | translate }}</p>
+
+    @if (error()) {
+    <p class="home-status home-status--error">{{ error() }}</p>
+    } @else if (loading()) {
+    <div class="car-list">
+        @for (i of skeletonArray; track i) {
+        <div class="car-card car-card--skeleton">
+            <div class="car-card__skeleton-img"></div>
+            <div class="car-card__skeleton-line car-card__skeleton-line--title"></div>
+            <div class="car-card__skeleton-line"></div>
+            <div class="car-card__skeleton-line car-card__skeleton-line--short"></div>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="car-list">
+
+        @for (car of limitedCars(); track car.id; let i = $index) {
+        <div class="car-card reveal" [style.transition-delay.ms]="i * 60" (click)="goToCarDetails(car.id)">
+            <div class="car-card__img-wrap">
+                <img [src]="'https://localhost:7035' + car.carImg" [alt]="car.carModel" loading="lazy" />
+                <span class="car-card__badge">{{ car.carType }}</span>
+            </div>
+            <div class="car-card__body">
+                <h3>{{ car.carModel }}</h3>
+                <p class="car-card__location">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 14s5-4.2 5-8a5 5 0 10-10 0c0 3.8 5 8 5 8z" stroke="currentColor"
+                            stroke-width="1.3" />
+                        <circle cx="8" cy="6" r="1.6" stroke="currentColor" stroke-width="1.3" />
+                    </svg>
+                    {{ car.city }}
+                </p>
+                <p class="car-card__price">{{ car.carPrice }} ₾</p>
+                <p class="car-card__meta">{{ car.fuelType }} · {{ car.carAge }}</p>
+            </div>
+        </div>
+        } @empty {
+        <p class="home-status">{{ 'home.noResults' | translate }}</p>
+        }
+
+    </div>
     }
 
-</div>
+</section>
 
-
+<!-- სტატისტიკის ზოლი -->
+@if (stats(); as s) {
+<section class="home-stats reveal">
+    <div class="home-stats__item">
+        <span class="home-stats__number">{{ s.totalCars }}+</span>
+        <span class="home-stats__label">{{ 'home.statsListings' | translate }}</span>
+    </div>
+    <div class="home-stats__item">
+        <span class="home-stats__number">{{ s.totalBrands }}+</span>
+        <span class="home-stats__label">{{ 'home.statsBrands' | translate }}</span>
+    </div>
+    <div class="home-stats__item">
+        <span class="home-stats__number">{{ s.totalCities }}</span>
+        <span class="home-stats__label">{{ 'home.statsCities' | translate }}</span>
+    </div>
+    <div class="home-stats__item">
+        <span class="home-stats__number">24/7</span>
+        <span class="home-stats__label">{{ 'home.statsSupport' | translate }}</span>
+    </div>
+</section>
 }
+
+<!-- მარკების ბადე -->
+@if (popularBrands().length > 0) {
+<section class="home-brands">
+    <div class="home-section__header reveal">
+        <h2>{{ 'home.browseByBrand' | translate }}</h2>
+    </div>
+
+    <div class="home-brands__grid">
+        @for (brand of popularBrands(); track $index; let i = $index) {
+        <button type="button" class="home-brands__item reveal" [style.transition-delay.ms]="i * 40"
+            (click)="filterByBrand(brand.name)">
+            @if (logoFailed().has(brand.name)) {
+            <span class="home-brands__logo-fallback">{{ getInitial(brand.name) }}</span>
+            } @else {
+            <img class="home-brands__logo-img" [src]="getLogoUrl(brand.name)" [alt]="brand.name" loading="lazy"
+                (error)="onLogoError(brand.name)" />
+            }
+            <span class="home-brands__name">{{ brand.name }}</span>
+            <span class="home-brands__count">{{ brand.count }}</span>
+        </button>
+        }
+    </div>
+</section>
+}
+
+<!-- როგორ მუშაობს -->
+<section class="home-steps">
+    <div class="home-section__header reveal">
+        <h2>{{ 'home.howItWorks' | translate }}</h2>
+    </div>
+
+    <div class="home-steps__grid">
+        <div class="home-steps__item reveal">
+            <span class="home-steps__num">01</span>
+            <h3>{{ 'home.step1Title' | translate }}</h3>
+            <p>{{ 'home.step1Text' | translate }}</p>
+        </div>
+        <div class="home-steps__item reveal" style="transition-delay: 80ms">
+            <span class="home-steps__num">02</span>
+            <h3>{{ 'home.step2Title' | translate }}</h3>
+            <p>{{ 'home.step2Text' | translate }}</p>
+        </div>
+        <div class="home-steps__item reveal" style="transition-delay: 160ms">
+            <span class="home-steps__num">03</span>
+            <h3>{{ 'home.step3Title' | translate }}</h3>
+            <p>{{ 'home.step3Text' | translate }}</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA სექცია -->
+<section class="home-cta reveal">
+    <div class="home-cta__content">
+        <h2>{{ 'home.ctaTitle' | translate }}</h2>
+        <p>{{ 'home.ctaSubtitle' | translate }}</p>
+
+        <div class="home-cta__btn-wrap">
+            <button type="button" class="home-cta__btn" (click)="goToAddCar()">
+                {{ 'home.ctaButton' | translate }}
+            </button>
+
+            @if (showAuthPrompt()) {
+            <div class="home-cta__auth-backdrop" (click)="closeAuthPrompt()"></div>
+            <div class="home-cta__auth-popover">
+                <button type="button" class="home-cta__auth-popover-close" (click)="closeAuthPrompt()"
+                    aria-label="Close">×</button>
+                <span class="home-cta__auth-popover-eyebrow">{{ 'auth.eyebrow' | translate }}</span>
+                <p class="home-cta__auth-popover-text">{{ 'auth.loginLead' | translate }}</p>
+                <div class="home-cta__auth-popover-actions">
+                    <a routerLink="/auth" class="home-cta__auth-popover-link home-cta__auth-popover-link--primary"
+                        (click)="closeAuthPrompt()">
+                        {{ 'nav.login' | translate }}
+                    </a>
+                    <a routerLink="/register" class="home-cta__auth-popover-link" (click)="closeAuthPrompt()">
+                        {{ 'nav.register' | translate }}
+                    </a>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</section>

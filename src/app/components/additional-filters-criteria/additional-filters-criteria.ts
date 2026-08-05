@@ -145,6 +145,10 @@ export class AdditionalFiltersCriteria {
   }
 
   onClearFilters(): void {
+    this.resetState();
+    this.clearFilters.emit();
+  }
+  resetState(): void {
     this.transmission.set(null);
     this.cylinders.set(null);
     this.airbags.set(null);
@@ -157,9 +161,8 @@ export class AdditionalFiltersCriteria {
     this.selectedInteriorMaterial.set(new Set());
     this.selectedInteriorColors.set(new Set());
     this.isExchangePossible.set(false);
-    this.clearFilters.emit();
+    this.showOtherCarColors.set(false); // სასურველია ესეც დაარესეტო
   }
-
   onChoose(): void {
     const criteria: AdditionalFiltersCriteriaValue = {
       transmission: this.transmission(),

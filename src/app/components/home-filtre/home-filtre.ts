@@ -1,4 +1,4 @@
-import { Component, input, output, computed, signal } from '@angular/core';
+import { Component, input, output, computed, signal, ViewChild } from '@angular/core';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AdditionalFiltersCriteria, AdditionalFiltersCriteriaValue } from '../additional-filters-criteria/additional-filters-criteria';
 
@@ -28,63 +28,63 @@ export interface CarDetails {
 
 export interface CarListItem {
 
-  id:number;
+  id: number;
 
-  city:string;
+  city: string;
 
-  carAge:string;
+  carAge: string;
 
-  carModel:string;
+  carModel: string;
 
-  carPrice:number;
+  carPrice: number;
 
-  carType:string;
+  carType: string;
 
-  fuelType:string;
+  fuelType: string;
 
-  carImg:string;
+  carImg: string;
 
 
-  images:{
-    id:number;
-    imageUrl:string;
+  images: {
+    id: number;
+    imageUrl: string;
   }[];
 
 
-  carDetals:{
-    manufacturer:string;
-    mileage:string;
-    engineVolume:string;
+  carDetals: {
+    manufacturer: string;
+    mileage: string;
+    engineVolume: string;
 
-    cylinders:number;
+    cylinders: number;
 
-    transmission:string;
-    driveType:string;
-    doors:string;
+    transmission: string;
+    driveType: string;
+    doors: string;
 
-    airbags:number;
+    airbags: number;
 
-    steeringWheel:string;
+    steeringWheel: string;
 
-    color:string;
+    color: string;
 
-    interiorColor:string;
+    interiorColor: string;
 
-    interiorMaterial:string;
-
-
-    isExchangePossible:boolean;
-
-    hasTechInspection:boolean;
-
-    hasCatalyst:boolean;
+    interiorMaterial: string;
 
 
-    description:string;
+    isExchangePossible: boolean;
 
-    userPhone:string;
+    hasTechInspection: boolean;
 
-    vinCode:string;
+    hasCatalyst: boolean;
+
+
+    description: string;
+
+    userPhone: string;
+
+    vinCode: string;
 
   } | null;
 
@@ -157,6 +157,8 @@ export class HomeFiltre {
     return Array.from(set).sort();
   });
 
+  @ViewChild(AdditionalFiltersCriteria) additionalFiltersRef?: AdditionalFiltersCriteria;
+
   toggleDropdown(name: string): void {
     this.openDropdown.update(current => (current === name ? null : name));
   }
@@ -226,9 +228,11 @@ export class HomeFiltre {
     this.vinOnly.set(false);
     this.priceNegotiableHidden.set(false);
     this.additionalCriteria.set(null);
+    this.additionalFiltersRef?.resetState(); 
     this.clearFilters.emit();
     this.emitChange();
   }
+
 
   onSearch(): void {
     this.emitChange();
@@ -247,4 +251,5 @@ export class HomeFiltre {
       additional: this.additionalCriteria(),
     });
   }
+
 }
