@@ -1,22 +1,34 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth-service';
 
-// Every [Authorize]-protected endpoint on the backend (add-car,
-// get-my-cars, ...) needs a Bearer token on the request. Nothing in
-// the app was attaching one, so those calls were silently failing
-// with 401. This fixes that globally, once, for every HttpClient call.
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const token = auth.getAccessToken();
 
-  if (!token) {
-    return next(req);
-  }
+  const authReq = token
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : req;
 
-  const authReq = req.clone({
-    setHeaders: { Authorization: `Bearer ${token}` }
-  });
-
-  return next(authReq);
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401 && auth.getRefreshToken()) {
+        return auth.refreshToken().pipe(
+          switchMap((newToken) => {
+            auth.setToken(newToken);
+            const retryReq = req.clone({
+              setHeaders: { Authorization: `Bearer ${newToken.accessToken}` }
+            });
+            return next(retryReq);
+          }),
+          catchError((refreshErr) => {
+            auth.logout();
+            return throwError(() => refreshErr);
+          })
+        );
+      }
+      return throwError(() => error);
+    })
+  );
 };

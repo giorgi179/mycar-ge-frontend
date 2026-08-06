@@ -1,7 +1,6 @@
-
 import { Component, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AddCarServices } from '../../services/add-car-services';
@@ -9,6 +8,45 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { CarAddRequest, CarModels } from '../../services/components';
 import { environment } from '../../../environments/environment';
 
+function yearValidator(control: AbstractControl): ValidationErrors | null {
+  const v = (control.value ?? '').toString().trim();
+  if (!v) return null;
+  const year = Number(v);
+  const currentYear = new Date().getFullYear();
+  if (!/^\d{4}$/.test(v) || year < 1950 || year > currentYear + 1) {
+    return { yearInvalid: true };
+  }
+  return null;
+}
+
+function positiveNumberValidator(control: AbstractControl): ValidationErrors | null {
+  const v = (control.value ?? '').toString().trim();
+  if (!v) return null;
+  const n = Number(v);
+  if (Number.isNaN(n) || n <= 0) {
+    return { numberInvalid: true };
+  }
+  return null;
+}
+
+function georgianPhoneValidator(control: AbstractControl): ValidationErrors | null {
+  const v = (control.value ?? '').toString().trim();
+  if (!v) return null;
+  const digitsOnly = v.replace(/\D/g, '');
+  if (!/^5\d{8}$/.test(digitsOnly)) {
+    return { phoneInvalid: true };
+  }
+  return null;
+}
+
+function vinValidator(control: AbstractControl): ValidationErrors | null {
+  const v = (control.value ?? '').toString().trim();
+  if (!v) return null;
+  if (!/^[A-HJ-NPR-Z0-9]{17}$/i.test(v)) {
+    return { vinInvalid: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-add-car',
@@ -36,10 +74,16 @@ export class AddCar {
   ];
 
   saleType = signal<'sale' | 'rent'>('sale');
-  vinLookup = '';
+
+  // error() ინახავს არა ტექსტს, არამედ თარგმანის key-ს (+ საჭიროების
+  // შემთხვევაში interpolation პარამეტრებს). Template თავად თარგმნის
+  // TranslatePipe-ის საშუალებით: {{ error() | translate:errorParams() }}
+  private errorKey = signal<string | null>(null);
+  private errorParamsSig = signal<Record<string, string | number> | undefined>(undefined);
+  error = computed(() => this.errorKey());
+  errorParams = computed(() => this.errorParamsSig());
 
   loading = signal(false);
-  error = signal<string | null>(null);
 
   minImages = 1;
   maxImages = 6;
@@ -58,11 +102,11 @@ export class AddCar {
   form = this.fb.group({
     manufacturer: ['', Validators.required],
     carModel: ['', Validators.required],
-    carAge: ['', Validators.required],
+    carAge: ['', [Validators.required, yearValidator]],
     carType: ['', Validators.required],
     fuelType: ['', Validators.required],
-    mileage: ['', Validators.required],
-    engineVolume: ['', Validators.required],
+    mileage: ['', [Validators.required, positiveNumberValidator]],
+    engineVolume: ['', [Validators.required, positiveNumberValidator]],
     cylinders: [null as number | null, Validators.required],
 
     transmission: ['', Validators.required],
@@ -81,8 +125,8 @@ export class AddCar {
     carPrice: [null as number | null, [Validators.required, Validators.min(1)]],
     isExchangePossible: [false],
     description: [''],
-    userPhone: ['', Validators.required],
-    vinCode: [''],
+    userPhone: ['', [Validators.required, georgianPhoneValidator]],
+    vinCode: ['', vinValidator],
   });
 
   stepFieldNames: Record<number, string[]> = {
@@ -124,23 +168,51 @@ export class AddCar {
     return names.every(name => this.form.get(name)?.valid ?? true);
   }
 
+  /** კონკრეტული ველის შეცდომის key. Template: {{ fieldErrorKey('carAge') | translate }} */
+  fieldErrorKey(name: string): string | null {
+    const control = this.form.get(name);
+    if (!control || !control.touched || control.valid) return null;
+
+    const errors = control.errors;
+    if (!errors) return null;
+
+    if (errors['required']) return 'addCar.errors.required';
+    if (errors['yearInvalid']) return 'addCar.errors.yearInvalid';
+    if (errors['numberInvalid']) return 'addCar.errors.numberInvalid';
+    if (errors['phoneInvalid']) return 'addCar.errors.phoneInvalid';
+    if (errors['vinInvalid']) return 'addCar.errors.vinInvalid';
+    if (errors['min']) return 'addCar.errors.priceMin';
+
+    return 'addCar.errors.required';
+  }
+
+  private setError(key: string, params?: Record<string, string | number>): void {
+    this.errorKey.set(key);
+    this.errorParamsSig.set(params);
+  }
+
+  private clearError(): void {
+    this.errorKey.set(null);
+    this.errorParamsSig.set(undefined);
+  }
+
   nextStep(): void {
     const names = this.stepFieldNames[this.step()] ?? [];
     names.forEach(n => this.form.get(n)?.markAsTouched());
 
     if (!this.isStepValid(this.step())) {
-      this.error.set('გთხოვთ შეავსოთ ყველა სავალდებულო ველი ამ საფეხურზე.');
+      this.setError('addCar.errors.stepIncomplete');
       return;
     }
 
-    this.error.set(null);
+    this.clearError();
     if (this.step() < this.totalSteps) {
       this.step.update(s => s + 1);
     }
   }
 
   prevStep(): void {
-    this.error.set(null);
+    this.clearError();
     if (this.step() > 1) {
       this.step.update(s => s - 1);
     }
@@ -150,32 +222,62 @@ export class AddCar {
     this.step.set(Math.min(Math.max(n, 1), this.totalSteps));
   }
 
-  lookupVin(): void {
-    if (!this.vinLookup.trim()) return;
-    // TODO: call VIN decode service and this.form.patchValue(result)
-  }
-
   onImagesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const incoming = Array.from(input.files);
-    const room = this.maxImages - this.selectedImages().length;
+    const currentCount = this.selectedImages().length;
 
-    if (room <= 0) {
-      this.error.set(`მაქსიმუმ ${this.maxImages} ფოტოს ატვირთვაა შესაძლებელი.`);
+    // უკვე ლიმიტზეა — საერთოდ არაფერი არ დაემატება
+    if (currentCount >= this.maxImages) {
+      this.setError('addCar.errors.maxImages', { max: this.maxImages });
       input.value = '';
       return;
     }
 
-    const accepted = incoming.slice(0, room);
-    if (incoming.length > accepted.length) {
-      this.error.set(`მაქსიმუმ ${this.maxImages} ფოტოს ატვირთვაა შესაძლებელი — დაემატა მხოლოდ პირველი ${accepted.length}.`);
-    } else {
-      this.error.set(null);
+    // მთლიანი მოთხოვნილი რაოდენობა (already selected + newly picked) ლიმიტს სცდება —
+    // მთლიანად უარვყოფთ არჩევანს, ნაწილობრივ აღარ ვჭრით ჩუმად.
+    if (currentCount + incoming.length > this.maxImages) {
+      this.setError('addCar.errors.maxImages', { max: this.maxImages });
+      input.value = '';
+      return;
     }
 
-    const combined = [...this.selectedImages(), ...accepted];
+    const validExt = ['.jpg', '.jpeg', '.png', '.webp'];
+    const maxBytes = 5 * 1024 * 1024;
+
+    const rejectedType: string[] = [];
+    const rejectedSize: string[] = [];
+    const valid: File[] = [];
+
+    for (const file of incoming) {
+      const ext = '.' + (file.name.split('.').pop() ?? '').toLowerCase();
+      if (!validExt.includes(ext)) {
+        rejectedType.push(file.name);
+        continue;
+      }
+      if (file.size > maxBytes) {
+        rejectedSize.push(file.name);
+        continue;
+      }
+      valid.push(file);
+    }
+
+    if (rejectedType.length) {
+      this.setError('addCar.errors.invalidImageType');
+      input.value = '';
+      return;
+    }
+    if (rejectedSize.length) {
+      this.setError('addCar.errors.imageTooLarge');
+      input.value = '';
+      return;
+    }
+
+    this.clearError();
+
+    const combined = [...this.selectedImages(), ...valid];
     this.selectedImages.set(combined);
 
     const previews: string[] = [];
@@ -204,7 +306,7 @@ export class AddCar {
     this.form.markAllAsTouched();
 
     if (this.form.invalid) {
-      this.error.set('გთხოვთ შეავსოთ ყველა სავალდებულო ველი.');
+      this.setError('addCar.errors.formInvalid');
       for (let s = 1; s <= this.totalSteps; s++) {
         if (!this.isStepValid(s)) {
           this.step.set(s);
@@ -215,12 +317,12 @@ export class AddCar {
     }
 
     if (this.selectedImages().length < this.minImages || this.selectedImages().length > this.maxImages) {
-      this.error.set(`საჭიროა ${this.minImages}-დან ${this.maxImages}-მდე ფოტოს ატვირთვა.`);
+      this.setError('addCar.errors.imageCountRange', { min: this.minImages, max: this.maxImages });
       this.step.set(3);
       return;
     }
 
-    this.error.set(null);
+    this.clearError();
     this.loading.set(true);
 
     const v = this.form.getRawValue();
@@ -264,29 +366,58 @@ export class AddCar {
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set(this.extractErrorMessage(err));
+        const { key, params } = this.extractServerErrorKey(err);
+        this.setError(key, params);
       }
     });
   }
 
-  private extractErrorMessage(err: any): string {
-    const body = err?.error;
-    if (typeof body === 'string' && body.trim()) return body;
-    if (body?.message) return body.message;
-    if (body?.title) return body.title;
-    if (body?.errors) {
-      const first = Object.values(body.errors as Record<string, string[]>)[0];
-      if (Array.isArray(first) && first.length) return first[0];
+  /** სერვერის შეცდომას გადააქცევს თარგმანის key-დ. */
+  private extractServerErrorKey(err: unknown): { key: string; params?: Record<string, string | number> } {
+    const httpErr = err as { status?: number; error?: unknown };
+
+    if (httpErr?.status === 401) {
+      return { key: 'addCar.errors.unauthorized' };
     }
-    if (err?.status === 401) return 'გთხოვთ გაიაროთ ავტორიზაცია განცხადების დასამატებლად.';
-    if (err?.status === 0) return 'სერვერთან კავშირი ვერ დამყარდა.';
-    return 'დაფიქსირდა შეცდომა მანქანის დამატებისას.';
+    if (httpErr?.status === 0) {
+      return { key: 'addCar.errors.networkError' };
+    }
+
+    const body = httpErr?.error as
+      | string
+      | { message?: string; title?: string; errors?: Record<string, string[]> }
+      | undefined;
+
+    const rawMessage: string | undefined =
+      (typeof body === 'string' && body.trim() ? body : undefined) ||
+      (typeof body === 'object' ? body?.message : undefined) ||
+      (typeof body === 'object' ? body?.title : undefined) ||
+      (typeof body === 'object' && body?.errors
+        ? Object.values(body.errors)[0]?.[0]
+        : undefined);
+
+    if (rawMessage) {
+      if (/საჭიროა.*ფოტოს ატვირთვა/.test(rawMessage)) {
+        return { key: 'addCar.errors.imageCountRange', params: { min: this.minImages, max: this.maxImages } };
+      }
+      if (/Image max 5MB/i.test(rawMessage)) {
+        return { key: 'addCar.errors.imageTooLarge' };
+      }
+      if (/Invalid format/i.test(rawMessage)) {
+        return { key: 'addCar.errors.invalidImageType' };
+      }
+      if (/User not found/i.test(rawMessage)) {
+        return { key: 'addCar.errors.userNotFound' };
+      }
+    }
+
+    return { key: 'addCar.errors.generic' };
   }
 
   savedListingsOpen = signal(false);
   savedListings = signal<CarModels[]>([]);
   savedListingsLoading = signal(false);
-  savedListingsError = signal<string | null>(null);
+  savedListingsErrorKey = signal<string | null>(null);
   savedListingsLoaded = false;
 
   toggleSavedListings(): void {
@@ -302,7 +433,7 @@ export class AddCar {
 
   loadSavedListings(): void {
     this.savedListingsLoading.set(true);
-    this.savedListingsError.set(null);
+    this.savedListingsErrorKey.set(null);
     this.api.getMyCars().subscribe({
       next: (cars) => {
         this.savedListingsLoading.set(false);
@@ -311,7 +442,7 @@ export class AddCar {
       },
       error: () => {
         this.savedListingsLoading.set(false);
-        this.savedListingsError.set('შენახული განცხადებების ჩატვირთვა ვერ მოხერხდა.');
+        this.savedListingsErrorKey.set('addCar.errors.savedListingsFailed');
       }
     });
   }

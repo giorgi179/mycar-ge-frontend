@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
+import { afterNextRender, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { Observable } from 'rxjs';
 import { Login, UserRegister, UserToken, Veryfi } from './components';
@@ -14,13 +14,22 @@ export class AuthService {
     private platformId = inject(PLATFORM_ID);
     private isBrowser = isPlatformBrowser(this.platformId);
 
-    isLoggedIn = signal<boolean>(this.hasToken());
+    isLoggedIn = signal<boolean>(false);
+
+    constructor() {
+        afterNextRender(() => {
+            this.isLoggedIn.set(this.hasToken());
+        });
+    }
 
     private hasToken(): boolean {
         if (!this.isBrowser) return false;
         return !!localStorage.getItem('accessToken');
     }
-
+    refreshToken(): Observable<UserToken> {
+        const refreshToken = this.getRefreshToken();
+        return this.http.post<UserToken>(`${this.api}/User/refresh-token`, { refreshToken });
+    }
     register(user: UserRegister): Observable<any> {
         const formData = new FormData();
         formData.append('firstName', user.firstName);

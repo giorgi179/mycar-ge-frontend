@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HomeService } from '../../services/home-service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -27,6 +27,9 @@ export class Cardetals implements OnInit {
   // გალერეის სთეითი
   activeIndex = signal<number>(0);
   activeImage = signal<string>('');
+
+  // lightbox-ის სთეითი
+  lightboxOpen = signal<boolean>(false);
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -77,6 +80,22 @@ export class Cardetals implements OnInit {
     const prev = (this.activeIndex() - 1 + total) % total;
     const url = prev === 0 ? c.carImg : c.images[prev - 1].imageUrl;
     this.setActiveImage(prev, url);
+  }
+
+  openLightbox(): void {
+    this.lightboxOpen.set(true);
+  }
+
+  closeLightbox(): void {
+    this.lightboxOpen.set(false);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeydown(event: KeyboardEvent): void {
+    if (!this.lightboxOpen()) return;
+    if (event.key === 'Escape') this.closeLightbox();
+    if (event.key === 'ArrowRight') this.nextImage();
+    if (event.key === 'ArrowLeft') this.prevImage();
   }
 
   goBack(): void {

@@ -7,13 +7,14 @@ import { authGuard } from './guards/auth-guard';
 import { ErorPage } from './components/eror-page/eror-page';
 import { Cars } from './components/cars/cars';
 import { Cardetals } from './components/cardetals/cardetals';
+import { guestGuard } from './guards/guest-guard-guard';
 
 export const routes: Routes = [
     { path: '', component: Home },
     { path: 'cars', component: Cars },
     { path: 'car/:id', component: Cardetals },
-    { path: 'auth', component: Auth },
+    { path: 'auth', component: Auth, canActivate: [guestGuard] },
     { path: 'add-car', component: AddCar, canActivate: [authGuard] },
-    { path: 'register', component: Register },
+    { path: 'register', component: Register, canActivate: [guestGuard] },
     { path: '**', component: ErorPage }
 ];

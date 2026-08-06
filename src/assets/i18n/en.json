@@ -215,6 +215,25 @@
         "submitting": "Submitting...",
         "showSavedListings": "Show saved listings",
         "hideSavedListings": "Hide saved listings",
-        "noSavedListings": "No saved listings yet."
+        "noSavedListings": "No saved listings yet.",
+        "errors": {
+            "required": "This field is required",
+            "yearInvalid": "Enter a valid year (e.g. 2020)",
+            "numberInvalid": "Enter a valid positive number",
+            "phoneInvalid": "Phone must be 9 digits and start with 5",
+            "priceMin": "Price must be greater than 1",
+            "vinInvalid": "VIN must be exactly 17 characters",
+            "stepIncomplete": "Please fill in all required fields on this step",
+            "formInvalid": "Please fill in all required fields",
+            "imageCountRange": "You need to upload between 1 and 6 photos",
+            "maxImages": "You can upload a maximum of 6 photos",
+            "invalidImageType": "Only JPG, PNG, or WebP images are allowed",
+            "imageTooLarge": "Image size must not exceed 5MB",
+            "unauthorized": "Please log in to add a listing",
+            "networkError": "Could not connect to the server",
+            "userNotFound": "User not found",
+            "savedListingsFailed": "Failed to load saved listings",
+            "generic": "An error occurred while adding the car"
+        }
     }
 }

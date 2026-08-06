@@ -1,409 +1,209 @@
-// add-car.scss — polished visuals, dead selectors removed
-// (add-car__success, add-car__pill-group--invalid dropped —
-// never referenced anywhere in the HTML)
+// ============================================================================
+// add-car.scss — MyCar.ge · განცხადების დამატება
+// Luxury-showroom დიზაინ-სისტემა: მუქი გვერდითი პანელი + ოქროსფერი აქცენტი
+// Mobile-first, სრული რესპონსიულობა 320px-მდე
+// ============================================================================
 
-@use 'sass:color';
+// ---------------------------------------------------------------------------
+// Design tokens
+// ---------------------------------------------------------------------------
+$ink-900:      #12141a;   // მთავარი მუქი (rail-ის ფონი)
+$ink-800:      #1b1e26;
+$ink-700:      #262a35;
+$ink-border:   #323744;
 
-:host {
-  --accent: #c4a661;
-  --accent-dark: #a3843f;
-  --ink: #0f1b14;
-  --border-color: #e8e5dd;
-  --text-primary: #14201a;
-  --text-muted: #767b74;
-  --bg-subtle: #f7f5f0;
-  --danger: #8b2e2e;
-  --danger-soft: #f7e9e9;
-  --success: #3f7a4e;
-  --success-soft: #eaf3ec;
+$paper:        #ffffff;
+$paper-soft:   #f7f6f3;   // თბილი off-white ფონი
+$paper-line:   #e7e4dc;
 
-  display: block;
-  font-family: 'Inter', -apple-system, sans-serif;
-}
+$ink:          #1c1d1f;   // ტექსტი მთავარ ზონაში
+$ink-muted:    #6b6f76;
+$ink-faint:    #9a9da3;
 
-$radius-sm: 6px;
-$radius-md: 10px;
-$radius-lg: 12px;
-$font-head: 'Barlow Condensed', 'Inter', sans-serif;
-$shadow-card: 0 1px 2px rgba(15, 27, 20, 0.05), 0 4px 14px rgba(15, 27, 20, 0.04);
-$shadow-card-hover: 0 6px 20px rgba(15, 27, 20, 0.09);
-$transition: 150ms ease;
+$gold:         #c9a227;
+$gold-soft:    #e2c56b;
+$gold-deep:    #a5811c;
+$gold-tint:    rgba(201, 162, 39, 0.12);
+
+$danger:       #d8493a;
+$danger-tint:  rgba(216, 73, 58, 0.08);
+$success:      #3f8f5f;
+
+$radius-sm:    8px;
+$radius-md:    12px;
+$radius-lg:    18px;
+
+$font-display: 'Marcellus', 'Playfair Display', Georgia, serif;
+$font-body:    'Manrope', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+$ease: cubic-bezier(0.4, 0, 0.2, 1);
 
 @mixin focus-ring {
   &:focus-visible {
-    outline: 2px solid var(--accent-dark);
+    outline: 2px solid $gold;
     outline-offset: 2px;
   }
 }
 
+// ---------------------------------------------------------------------------
+// Layout shell
+// ---------------------------------------------------------------------------
 .add-car {
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 24px;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 28px;
   max-width: 1180px;
   margin: 0 auto;
-  padding: 32px 24px 72px;
-  color: var(--text-primary);
-  background: var(--bg-subtle);
-  align-items: start;
+  padding: 32px 24px 64px;
+  font-family: $font-body;
+  color: $ink;
+  background: $paper-soft;
 
-  @media (max-width: 860px) {
+  @media (max-width: 960px) {
     grid-template-columns: 1fr;
-    padding: 20px 14px 56px;
-    gap: 16px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 18px 14px 40px;
+    gap: 18px;
   }
 
   @media (max-width: 320px) {
-    padding: 14px 8px 48px;
+    padding: 14px 10px 32px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rail (გვერდითი პანელი)
+// ---------------------------------------------------------------------------
+.add-car__rail {
+  background: linear-gradient(180deg, $ink-900 0%, $ink-800 100%);
+  border-radius: $radius-lg;
+  padding: 20px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+  color: $paper;
+  box-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.45);
+
+  @media (max-width: 960px) {
+    position: static;
+    order: -1;
   }
 
-  &__rail {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    position: sticky;
-    top: 24px;
-
-    @media (max-width: 860px) {
-      position: static;
-    }
-  }
-
-  &__rail-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    background: var(--ink);
-    color: #fff;
-    font-family: $font-head;
-    font-weight: 600;
-    font-size: 1rem;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    text-align: left;
-    padding: 15px 16px;
+  @media (max-width: 480px) {
+    padding: 16px;
     border-radius: $radius-md;
-    border: none;
-    width: 100%;
-    cursor: pointer;
-    transition: background $transition, box-shadow $transition;
-    @include focus-ring;
-
-    &:hover {
-      background: color.adjust(#0f1b14, $lightness: 6%);
-      box-shadow: 0 4px 14px rgba(15, 27, 20, 0.22);
-    }
-
-    svg {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-      color: var(--accent);
-      transition: transform $transition;
-    }
-
-    &--open svg {
-      transform: rotate(180deg);
-    }
-
-    @media (max-width: 320px) {
-      padding: 12px;
-      font-size: 0.9rem;
-    }
   }
+}
 
-  &__rail-steps {
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: $radius-md;
-    padding: 20px 18px;
-    box-shadow: $shadow-card;
-  }
+.add-car__rail-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid $ink-border;
+  border-radius: $radius-sm;
+  padding: 12px 14px;
+  color: $paper;
+  font-family: $font-body;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s $ease, background 0.2s $ease;
+  @include focus-ring;
 
-  &__rail-step {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    position: relative;
-    padding-bottom: 26px;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    width: 100%;
-    text-align: left;
-    font-family: inherit;
-    @include focus-ring;
-
-    &:last-child {
-      padding-bottom: 0;
-
-      .add-car__rail-connector {
-        display: none;
-      }
-    }
-  }
-
-  &__rail-marker {
+  svg {
+    width: 16px;
+    height: 16px;
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid var(--border-color);
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color $transition, background $transition;
-    margin-top: 1px;
-    position: relative;
-
-    svg {
-      width: 11px;
-      height: 11px;
-      opacity: 0;
-      transition: opacity $transition;
-      position: relative;
-      z-index: 1;
-      color: #fff;
-    }
+    transition: transform 0.25s $ease;
   }
 
-  &__rail-connector {
-    position: absolute;
-    left: 9px;
-    top: 22px;
-    bottom: 2px;
-    width: 1px;
-    background: var(--border-color);
+  &:hover {
+    border-color: $gold;
+    background: rgba(201, 162, 39, 0.06);
   }
 
-  &__rail-label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: color.adjust(#767b74, $lightness: 8%);
-    line-height: 1.35;
-    padding-top: 1px;
-    transition: color $transition;
+  &--open {
+    border-color: $gold;
+
+    svg { transform: rotate(180deg); }
+  }
+}
+
+.add-car__saved-panel {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid $ink-border;
+  border-radius: $radius-sm;
+  background: rgba(255, 255, 255, 0.03);
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb {
+    background: $ink-border;
+    border-radius: 4px;
+  }
+}
+
+.add-car__saved-loading,
+.add-car__saved-error,
+.add-car__saved-empty {
+  font-size: 0.82rem;
+  color: $ink-faint;
+  text-align: center;
+  padding: 14px 6px;
+}
+
+.add-car__saved-error { color: $danger; }
+
+.add-car__saved-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: $radius-sm;
+  padding: 8px;
+  text-align: left;
+  cursor: pointer;
+  color: $paper;
+  transition: background 0.2s $ease;
+  @include focus-ring;
+
+  &:hover { background: rgba(255, 255, 255, 0.06); }
+
+  img {
+    width: 44px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
   }
 
-  &__rail-step {
-    &--current {
-      .add-car__rail-marker {
-        border-color: var(--accent-dark);
-
-        &::after {
-          content: '';
-          position: absolute;
-          width: 9px;
-          height: 9px;
-          border-radius: 50%;
-          background: var(--accent-dark);
-        }
-      }
-
-      .add-car__rail-label {
-        color: var(--text-primary);
-        font-weight: 700;
-      }
-    }
-
-    &--done {
-      .add-car__rail-marker {
-        border-color: var(--success);
-        background: var(--success);
-
-        svg {
-          opacity: 1;
-        }
-      }
-
-      .add-car__rail-connector {
-        background: var(--success);
-      }
-
-      .add-car__rail-label {
-        color: var(--text-muted);
-      }
-    }
+  &-noimg {
+    width: 44px;
+    height: 34px;
+    border-radius: 6px;
+    background: $ink-700;
+    flex-shrink: 0;
   }
 
-  &__rail-preview {
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: $radius-md;
-    overflow: hidden;
-    box-shadow: $shadow-card;
-    transition: box-shadow $transition;
-
-    &:hover {
-      box-shadow: $shadow-card-hover;
-    }
-  }
-
-  &__rail-preview-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding: 12px 14px 0;
-  }
-
-  &__rail-preview-img {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    background: var(--bg-subtle);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: color.adjust(#767b74, $lightness: 20%);
-    margin: 8px 0 0;
-    border-bottom: 3px solid var(--accent);
-    overflow: hidden;
-
-    svg {
-      width: 42px;
-      height: 42px;
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-
-  &__rail-preview-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 3px 9px;
-    background: rgba(15, 27, 20, 0.78);
-    backdrop-filter: blur(3px);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    border-radius: 2px;
-  }
-
-  &__rail-preview-body {
-    padding: 14px;
-
-    h3 {
-      margin: 0 0 6px;
-      font-family: $font-head;
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      text-transform: uppercase;
-      color: var(--text-primary);
-
-      &.add-car__rail-preview-placeholder {
-        color: color.adjust(#767b74, $lightness: 22%);
-        font-weight: 500;
-        text-transform: none;
-        font-family: inherit;
-        font-size: 0.88rem;
-      }
-    }
-  }
-
-  &__rail-preview-location {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin: 0 0 8px;
-    font-size: 0.78rem;
-    color: var(--text-muted);
-
-    svg {
-      width: 11px;
-      height: 11px;
-      flex-shrink: 0;
-    }
-  }
-
-  &__rail-preview-price {
-    margin: 0 0 2px;
-    font-family: $font-head;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--accent-dark);
-  }
-
-  &__rail-preview-meta {
-    margin: 0;
-    font-size: 0.76rem;
-    color: var(--text-muted);
-  }
-
-  &__saved-panel {
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: $radius-md;
-    box-shadow: $shadow-card;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 320px;
-    overflow-y: auto;
-  }
-
-  &__saved-empty,
-  &__saved-loading,
-  &__saved-error {
-    padding: 14px 6px;
-    text-align: center;
-    font-size: 0.82rem;
-    color: var(--text-muted);
-  }
-
-  &__saved-error {
-    color: var(--danger);
-  }
-
-  &__saved-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    border-radius: $radius-sm;
-    cursor: pointer;
-    transition: background $transition;
-    text-align: left;
-    border: none;
-    background: none;
-    width: 100%;
-    font-family: inherit;
-    @include focus-ring;
-
-    &:hover {
-      background: var(--bg-subtle);
-    }
-
-    img,
-    &-noimg {
-      width: 48px;
-      height: 36px;
-      object-fit: cover;
-      border-radius: 4px;
-      flex-shrink: 0;
-      background: var(--bg-subtle);
-    }
-
-    div {
-      min-width: 0;
-    }
+  div {
+    min-width: 0;
 
     strong {
       display: block;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 600;
-      color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -411,812 +211,846 @@ $transition: 150ms ease;
 
     span {
       display: block;
-      font-size: 0.76rem;
-      color: var(--text-muted);
+      font-size: 0.74rem;
+      color: $ink-faint;
     }
   }
+}
 
-  &__main {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    min-width: 0;
+// --- Steps ---
+.add-car__rail-steps {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.add-car__rail-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  padding: 10px 4px;
+  color: $ink-faint;
+  cursor: pointer;
+  text-align: left;
+  font-family: $font-body;
+  font-size: 0.86rem;
+  @include focus-ring;
+
+  &:not(:last-child) .add-car__rail-connector {
+    position: absolute;
+    left: 15px;
+    top: 34px;
+    width: 2px;
+    height: calc(100% - 10px);
+    background: $ink-border;
   }
 
-  &__heading {
-    h1 {
-      font-family: $font-head;
-      font-size: 1.7rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: var(--text-primary);
-      margin: 0 0 4px;
+  &--done {
+    color: $paper;
+
+    .add-car__rail-marker {
+      background: $gold;
+      border-color: $gold;
+      color: $ink-900;
     }
 
-    p {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin: 0;
-    }
+    &:not(:last-child) .add-car__rail-connector { background: $gold-deep; }
   }
 
-  &__saletype-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: $radius-md;
-    padding: 16px 20px;
-    box-shadow: $shadow-card;
-    flex-wrap: wrap;
-
-    @media (max-width: 480px) {
-      padding: 14px 16px;
-    }
-  }
-
-  &__radio-group {
-    display: flex;
-    gap: 26px;
-  }
-
-  &__radio {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    background: none;
-    border: none;
-    padding: 0;
-    font-family: inherit;
-    @include focus-ring;
-
-    &-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: border-color $transition;
-
-      &::after {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--accent-dark);
-        opacity: 0;
-        transition: opacity $transition;
-      }
-    }
-
-    &--active {
-      color: var(--text-primary);
-
-      .add-car__radio-dot {
-        border-color: var(--accent-dark);
-
-        &::after {
-          opacity: 1;
-        }
-      }
-    }
-  }
-
-  &__vin {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    background: var(--bg-subtle);
-    border: 1px solid var(--border-color);
-    border-radius: $radius-lg;
-    padding: 22px 24px;
-    flex-wrap: wrap;
-
-    @media (max-width: 620px) {
-      padding: 18px;
-    }
-  }
-
-  &__vin-copy {
-    max-width: 400px;
-
-    h3 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 0 0 6px;
-      font-family: $font-head;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    p {
-      margin: 0;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-  }
-
-  &__vin-badge {
-    background: var(--accent-dark);
-    color: #fff;
-    font-size: 0.66rem;
+  &--current {
+    color: $paper;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 3px 9px;
-    border-radius: 20px;
+
+    .add-car__rail-marker {
+      border-color: $gold;
+      box-shadow: 0 0 0 4px $gold-tint;
+    }
+
+    .add-car__rail-label { color: $gold-soft; }
   }
 
-  &__vin-action {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    flex-shrink: 0;
+  &:hover:not(&--current) { color: $paper; }
+}
 
-    @media (max-width: 620px) {
-      width: 100%;
-      align-items: stretch;
-    }
+.add-car__rail-marker {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid $ink-border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $ink-900;
+  z-index: 1;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0;
+    transition: opacity 0.2s $ease;
+  }
+}
+
+.add-car__rail-step--done .add-car__rail-marker svg { opacity: 1; }
+
+.add-car__rail-label { transition: color 0.2s $ease; }
+
+// --- Preview card ---
+.add-car__rail-preview {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid $ink-border;
+}
+
+.add-car__rail-preview-label {
+  font-family: $font-display;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $gold-soft;
+  margin: 0 0 10px;
+}
+
+.add-car__rail-preview-img {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: $radius-sm;
+  background: $ink-700;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  &__vin-input-row {
-    display: flex;
-    gap: 10px;
+  svg {
+    width: 34px;
+    height: 34px;
+    color: $ink-border;
+  }
+}
 
-    @media (max-width: 480px) {
-      flex-direction: column;
-    }
+.add-car__rail-preview-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: $gold;
+  color: $ink-900;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.add-car__rail-preview-body {
+  margin-top: 12px;
+
+  h3 {
+    font-family: $font-display;
+    font-size: 1.05rem;
+    margin: 0 0 6px;
+    color: $paper;
   }
 
-  &__vin-input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
+  &-placeholder {
+    color: $ink-faint;
+    font-weight: 400;
+    font-style: italic;
+  }
+}
 
-    svg {
-      position: absolute;
-      right: 13px;
-      width: 16px;
-      height: 16px;
-      color: color.adjust(#767b74, $lightness: 15%);
-      pointer-events: none;
-    }
+.add-car__rail-preview-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: $ink-faint;
+  margin: 0 0 8px;
 
-    input {
-      width: 240px;
-      background: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: $radius-sm;
-      padding: 12px 38px 12px 14px;
-      font-family: inherit;
-      font-size: 0.88rem;
-      color: var(--text-primary);
-      box-sizing: border-box;
-      height: 46px;
-      transition: border-color $transition, box-shadow $transition;
-      @include focus-ring;
+  svg { width: 13px; height: 13px; flex-shrink: 0; }
+}
 
-      &:focus {
-        border-color: var(--accent-dark);
-        box-shadow: 0 0 0 3px rgba(163, 132, 63, 0.14);
-      }
+.add-car__rail-preview-price {
+  font-family: $font-display;
+  font-size: 1.3rem;
+  color: $gold-soft;
+  margin: 0 0 4px;
+}
 
-      @media (max-width: 480px) {
-        width: 100%;
-      }
+.add-car__rail-preview-meta {
+  font-size: 0.78rem;
+  color: $ink-faint;
+  margin: 0;
+}
 
-      &::placeholder {
-        color: color.adjust(#767b74, $lightness: 18%);
-      }
-    }
+// ---------------------------------------------------------------------------
+// Main column
+// ---------------------------------------------------------------------------
+.add-car__main {
+  min-width: 0;
+}
+
+.add-car__heading {
+  margin-bottom: 20px;
+
+  h1 {
+    font-family: $font-display;
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.1rem);
+    margin: 0 0 6px;
+    color: $ink;
   }
 
-  &__vin-add-btn {
-    border: none;
-    background: var(--ink);
-    color: #fff;
-    font-family: inherit;
-    font-weight: 700;
-    font-size: 0.86rem;
-    padding: 0 24px;
-    height: 46px;
-    border-radius: $radius-sm;
-    cursor: pointer;
-    transition: background $transition;
-    @include focus-ring;
-
-    &:hover {
-      background: color.adjust(#0f1b14, $lightness: 8%);
-    }
-  }
-
-  &__vin-find {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 0.78rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 2px 0;
-    @include focus-ring;
-
-    svg {
-      width: 14px;
-      height: 14px;
-    }
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  &__error {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--danger-soft);
-    border: 1px solid rgba(139, 46, 46, 0.2);
-    color: var(--danger);
-    border-radius: $radius-sm;
-    padding: 13px 16px;
-    font-size: 0.88rem;
-    font-weight: 500;
+  p {
     margin: 0;
-
-    svg {
-      flex-shrink: 0;
-    }
-
-    @media (max-width: 320px) {
-      padding: 10px 12px;
-      font-size: 0.8rem;
-    }
+    color: $ink-muted;
+    font-size: 0.94rem;
   }
+}
 
-  &__form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+// --- Sale type ---
+.add-car__saletype-row { margin-bottom: 16px; }
 
-  &__section {
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: $radius-lg;
-    box-shadow: $shadow-card;
-    animation: fadeSlideIn 220ms ease;
-    overflow: hidden;
-  }
+.add-car__radio-group {
+  display: inline-flex;
+  background: $paper;
+  border: 1px solid $paper-line;
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
 
-  @keyframes fadeSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+.add-car__radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: $ink-muted;
+  cursor: pointer;
+  transition: background 0.2s $ease, color 0.2s $ease;
+  @include focus-ring;
 
-  &__section-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border-color);
-
-    @media (max-width: 480px) {
-      padding: 16px 18px;
-    }
-  }
-
-  &__section-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: $font-head;
-    font-size: 1.15rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    color: var(--text-primary);
-
-    svg {
-      width: 19px;
-      height: 19px;
-      color: var(--accent-dark);
-      flex-shrink: 0;
-    }
-  }
-
-  &__section-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 600;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  &__progress-ring {
-    width: 15px;
-    height: 15px;
+  &-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    border: 2px solid var(--success-soft);
-    border-top-color: var(--success);
-    flex-shrink: 0;
-    transition: border-top-color $transition;
+    border: 2px solid $ink-faint;
+    transition: all 0.2s $ease;
+  }
 
-    &--complete {
-      border-top-color: var(--success);
-      border-color: var(--success);
+  &--active {
+    background: $ink-900;
+    color: $paper;
+
+    .add-car__radio-dot {
+      background: $gold;
+      border-color: $gold;
     }
   }
 
-  &__section-body {
-    padding: 22px 24px 24px;
-
-    @media (max-width: 480px) {
-      padding: 16px 18px 18px;
-    }
-
-    @media (max-width: 320px) {
-      padding: 12px 14px 14px;
-    }
+  @media (max-width: 380px) {
+    padding: 8px 12px;
+    font-size: 0.8rem;
   }
+}
 
-  &__row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
+// --- VIN block ---
+.add-car__vin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(135deg, $ink-900, $ink-700);
+  border-radius: $radius-lg;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  color: $paper;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    @media (max-width: 560px) {
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-  }
-
-  &__field {
-    display: flex;
+  @media (max-width: 720px) {
     flex-direction: column;
-    min-width: 0;
-    margin-bottom: 18px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
+    align-items: stretch;
+    padding: 18px;
   }
+}
 
-  &__required {
-    color: var(--danger);
-    margin-left: 2px;
-  }
-
-  &__control {
-    position: relative;
+.add-car__vin-copy {
+  h3 {
     display: flex;
     align-items: center;
-    height: 48px;
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: $radius-sm;
-    transition: border-color $transition, box-shadow $transition;
-
-    &:hover {
-      border-color: color.adjust(#e8e5dd, $lightness: -12%);
-    }
-
-    &:focus-within {
-      border-color: var(--accent-dark);
-      box-shadow: 0 0 0 3px rgba(163, 132, 63, 0.14);
-    }
-
-    &--invalid {
-      border-color: var(--danger);
-
-      &:focus-within {
-        border-color: var(--danger);
-        box-shadow: 0 0 0 3px rgba(139, 46, 46, 0.12);
-      }
-    }
-
-    input,
-    select {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: transparent;
-      box-shadow: none !important;
-      padding: 0 15px;
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text-primary);
-      appearance: none;
-
-      &:focus {
-        box-shadow: none;
-        outline: none;
-      }
-
-      &::placeholder {
-        color: color.adjust(#767b74, $lightness: 18%);
-        font-weight: 400;
-      }
-    }
-
-    &--has-chevron {
-      svg.add-car__chevron {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 15px;
-        height: 15px;
-        color: var(--text-muted);
-        pointer-events: none;
-        z-index: 2;
-      }
-
-      select {
-        padding-right: 38px;
-      }
-    }
-  }
-
-  &__field-hint {
-    margin-top: 6px;
-    font-size: 0.76rem;
-    color: var(--danger);
-  }
-
-  textarea {
-    width: 100%;
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: $radius-sm;
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 500;
-    padding: 13px 15px;
-    resize: vertical;
-    min-height: 110px;
-    line-height: 1.55;
-    box-sizing: border-box;
-    transition: border-color $transition, box-shadow $transition;
-    @include focus-ring;
-
-    &:hover {
-      border-color: color.adjust(#e8e5dd, $lightness: -12%);
-    }
-
-    &:focus {
-      border-color: var(--accent-dark);
-      box-shadow: 0 0 0 3px rgba(163, 132, 63, 0.14);
-      outline: none;
-    }
-
-    &::placeholder {
-      color: color.adjust(#767b74, $lightness: 18%);
-    }
-  }
-
-  input[type='file'] {
-    width: 100%;
-    color: var(--text-muted);
-    font-size: 0.82rem;
-    background: var(--bg-subtle);
-    border: 1px dashed var(--border-color);
-    border-radius: $radius-sm;
-    padding: 15px 12px;
-    box-sizing: border-box;
-    cursor: pointer;
-    transition: border-color $transition, background $transition;
-    font-family: inherit;
-    @include focus-ring;
-
-    @media (max-width: 320px) {
-      padding: 11px 9px;
-      font-size: 0.74rem;
-    }
-
-    &:hover:not(:disabled) {
-      border-color: var(--accent-dark);
-      background: rgba(196, 166, 97, 0.08);
-    }
-
-    &:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
-
-    &::file-selector-button {
-      background: var(--ink);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 14px;
-      margin-right: 12px;
-      font-weight: 600;
-      font-size: 0.78rem;
-      cursor: pointer;
-      transition: background $transition;
-      font-family: inherit;
-
-      &:hover {
-        background: color.adjust(#0f1b14, $lightness: 8%);
-      }
-    }
-  }
-
-  &__field-label {
-    display: block;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: 9px;
-
-    @media (max-width: 320px) {
-      font-size: 0.74rem;
-      margin-bottom: 7px;
-    }
-  }
-
-  &__pill-group {
-    display: flex;
-    flex-wrap: wrap;
     gap: 8px;
-
-    @media (max-width: 320px) {
-      gap: 6px;
-    }
+    font-family: $font-display;
+    font-size: 1.1rem;
+    margin: 0 0 6px;
   }
 
-  &__pill {
-    padding: 9px 15px;
-    border-radius: $radius-sm;
-    border: 1px solid var(--border-color);
-    background: #fff;
-    color: var(--text-muted);
+  p {
+    margin: 0;
     font-size: 0.84rem;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background $transition, border-color $transition, color $transition, transform $transition;
-    @include focus-ring;
+    color: rgba(255, 255, 255, 0.65);
+    max-width: 320px;
+  }
+}
 
-    @media (max-width: 320px) {
-      padding: 7px 11px;
-      font-size: 0.74rem;
-    }
+.add-car__vin-badge {
+  background: $gold;
+  color: $ink-900;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
 
-    &:hover {
-      border-color: var(--accent-dark);
-      color: var(--accent-dark);
-    }
+.add-car__vin-action {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 280px;
 
-    &:active {
-      transform: scale(0.97);
-    }
+  @media (max-width: 720px) { min-width: 0; }
+}
 
-    &--active {
-      background: var(--ink);
-      border-color: var(--ink);
-      color: #fff;
-      font-weight: 600;
+.add-car__vin-input-row {
+  display: flex;
+  gap: 8px;
+
+  @media (max-width: 380px) { flex-direction: column; }
+}
+
+.add-car__vin-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+
+  input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: $radius-sm;
+    padding: 11px 38px 11px 14px;
+    color: $paper;
+    font-size: 0.88rem;
+    font-family: $font-body;
+    transition: border-color 0.2s $ease;
+
+    &::placeholder { color: rgba(255, 255, 255, 0.4); }
+    &:focus {
+      outline: none;
+      border-color: $gold;
     }
   }
 
-  &__switch {
-    position: relative;
-    width: 36px;
-    height: 20px;
+  svg {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+  }
+}
+
+.add-car__vin-add-btn {
+  background: $gold;
+  color: $ink-900;
+  border: none;
+  border-radius: $radius-sm;
+  padding: 0 20px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: background 0.2s $ease, transform 0.15s $ease;
+  @include focus-ring;
+
+  &:hover { background: $gold-soft; }
+  &:active { transform: scale(0.97); }
+}
+
+.add-car__vin-find {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 2px 0;
+  width: fit-content;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  @include focus-ring;
+
+  svg { width: 14px; height: 14px; }
+
+  &:hover { color: $gold-soft; }
+}
+
+// --- Error banner ---
+.add-car__error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: $danger-tint;
+  border: 1px solid rgba(216, 73, 58, 0.3);
+  color: $danger;
+  border-radius: $radius-sm;
+  padding: 11px 14px;
+  font-size: 0.85rem;
+  margin: 0 0 18px;
+
+  svg { flex-shrink: 0; }
+}
+
+// ---------------------------------------------------------------------------
+// Form sections
+// ---------------------------------------------------------------------------
+.add-car__form { display: block; }
+
+.add-car__section {
+  background: $paper;
+  border: 1px solid $paper-line;
+  border-radius: $radius-lg;
+  padding: 22px 24px 26px;
+  margin-bottom: 18px;
+  animation: add-car-fade-in 0.3s $ease;
+
+  @media (max-width: 480px) {
+    padding: 16px 16px 20px;
+    border-radius: $radius-md;
+  }
+}
+
+@keyframes add-car-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.add-car__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid $paper-line;
+
+  @media (max-width: 420px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+.add-car__section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: $font-display;
+  font-size: 1.15rem;
+  color: $ink;
+
+  svg {
+    width: 19px;
+    height: 19px;
+    color: $gold-deep;
     flex-shrink: 0;
-    border-radius: 999px;
-    background: var(--border-color);
-    transition: background $transition;
-    cursor: pointer;
-
-    span {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 1px 2px rgba(15, 27, 20, 0.2);
-      transition: transform $transition;
-    }
-
-    &--on {
-      background: var(--accent-dark);
-
-      span {
-        transform: translateX(16px);
-      }
-    }
   }
+}
 
-  &__field--toggle {
-    display: flex;
+.add-car__section-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: $ink-muted;
+  white-space: nowrap;
+}
+
+.add-car__progress-ring {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: $paper-line;
+  border: 2px solid $paper-line;
+
+  &--complete {
+    background: $success;
+    border-color: $success;
+  }
+}
+
+.add-car__section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.add-car__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.add-car__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+
+  &:last-child { margin-bottom: 0; }
+
+  &--toggle {
+    flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
 
     label {
-      font-size: 0.9rem;
-      color: var(--text-primary);
-      font-weight: 500;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: $ink;
     }
   }
+}
 
-  &__photo-hint {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    margin-top: 8px;
+.add-car__field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $ink;
+}
+
+.add-car__required {
+  color: $danger;
+  margin-left: 2px;
+}
+
+// --- Inputs / selects ---
+.add-car__control {
+  position: relative;
+  background: $paper-soft;
+  border: 1px solid $paper-line;
+  border-radius: $radius-sm;
+  transition: border-color 0.2s $ease, box-shadow 0.2s $ease;
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    font-family: $font-body;
+    color: $ink;
+
+    &:focus { outline: none; }
+    &::placeholder { color: $ink-faint; }
   }
 
-  &__photo-grid {
-    display: grid;
+  select {
+    appearance: none;
+    cursor: pointer;
+  }
+
+  &:focus-within {
+    border-color: $gold;
+    box-shadow: 0 0 0 3px $gold-tint;
+  }
+
+  &--has-chevron select { padding-right: 36px; }
+
+  &--invalid {
+    border-color: $danger;
+    box-shadow: 0 0 0 3px $danger-tint;
+  }
+}
+
+.add-car__chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: $ink-muted;
+  pointer-events: none;
+}
+
+.add-car__field-hint {
+  font-size: 0.76rem;
+  color: $danger;
+  margin: 2px 0 0;
+}
+
+textarea { resize: vertical; min-height: 100px; }
+
+// --- Pill choices ---
+.add-car__pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.add-car__pill {
+  background: $paper-soft;
+  border: 1px solid $paper-line;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: $ink-muted;
+  cursor: pointer;
+  transition: all 0.18s $ease;
+  @include focus-ring;
+
+  &:hover {
+    border-color: $gold-soft;
+    color: $ink;
+  }
+
+  &--active {
+    background: $ink-900;
+    border-color: $ink-900;
+    color: $paper;
+
+    &:hover { color: $paper; }
+  }
+
+  @media (max-width: 380px) {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+// --- Toggle switch ---
+.add-car__switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: $paper-line;
+  cursor: pointer;
+  transition: background 0.2s $ease;
+  flex-shrink: 0;
+
+  span {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: $paper;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s $ease;
+  }
+
+  &--on {
+    background: $gold;
+
+    span { transform: translateX(18px); }
+  }
+}
+
+// --- Photos ---
+input[type='file'] {
+  width: 100%;
+  font-size: 0.84rem;
+  color: $ink-muted;
+  padding: 10px;
+  border: 1px dashed $paper-line;
+  border-radius: $radius-sm;
+  background: $paper-soft;
+  cursor: pointer;
+
+  &::file-selector-button {
+    background: $ink-900;
+    color: $paper;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 12px;
+    margin-right: 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.add-car__photo-hint {
+  font-size: 0.76rem;
+  color: $ink-faint;
+  margin: 6px 0 0;
+}
+
+.add-car__photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+
+  @media (max-width: 380px) {
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
-    margin-top: 12px;
+  }
+}
 
-    @media (max-width: 480px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
+.add-car__photo-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  border: 2px solid transparent;
 
-    @media (max-width: 320px) {
-      gap: 6px;
-    }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  &__photo-thumb {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    border-radius: $radius-sm;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-    background: var(--bg-subtle);
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    &--cover::after {
-      content: 'Cover';
-      position: absolute;
-      bottom: 5px;
-      left: 5px;
-      background: rgba(15, 27, 20, 0.78);
-      color: #fff;
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 2px 6px;
-      border-radius: 2px;
-    }
-
-    button {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(15, 27, 20, 0.75);
-      color: #fff;
-      font-size: 0.95rem;
-      line-height: 1;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background $transition;
-
-      &:hover {
-        background: var(--danger);
-      }
-    }
-  }
-
-  &__nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-
-    @media (max-width: 320px) {
-      margin-top: 4px;
-    }
-  }
-
-  &__btn {
-    flex: 1;
-    padding: 13px 20px;
-    border-radius: $radius-sm;
-    border: 1px solid transparent;
-    font-family: inherit;
-    font-weight: 700;
+  button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(18, 20, 26, 0.75);
+    color: $paper;
+    line-height: 1;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: background $transition, border-color $transition, color $transition, opacity $transition, transform $transition;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     @include focus-ring;
 
-    @media (max-width: 320px) {
-      padding: 10px 14px;
-      font-size: 0.8rem;
-    }
+    &:hover { background: $danger; }
+  }
 
-    &:active:not(:disabled) {
-      transform: scale(0.98);
-    }
+  &--cover {
+    border-color: $gold;
 
-    &--ghost {
-      background: #fff;
-      border-color: var(--border-color);
-      color: var(--text-muted);
-
-      &:hover {
-        border-color: var(--text-muted);
-        color: var(--text-primary);
-      }
-    }
-
-    &--primary {
-      background: var(--ink);
-      color: #fff;
-
-      &:hover {
-        background: color.adjust(#0f1b14, $lightness: 8%);
-      }
-    }
-
-    &--submit {
-      background: var(--accent-dark);
-      color: #fff;
-
-      &:hover {
-        background: color.adjust(#a3843f, $lightness: -6%);
-      }
-
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
+    &::after {
+      content: 'Cover';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: $gold;
+      color: $ink-900;
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 2px 0;
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Navigation buttons
+// ---------------------------------------------------------------------------
+.add-car__nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 6px;
+
+  @media (max-width: 420px) {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}
+
+.add-car__btn {
+  border-radius: 999px;
+  padding: 13px 30px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: $font-body;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.15s $ease, box-shadow 0.2s $ease, background 0.2s $ease;
+  @include focus-ring;
+
+  &:active { transform: scale(0.98); }
+
+  &--ghost {
+    background: transparent;
+    border-color: $paper-line;
+    color: $ink-muted;
+
+    &:hover {
+      border-color: $ink-faint;
+      color: $ink;
+    }
+  }
+
+  &--primary {
+    background: $ink-900;
+    color: $paper;
+
+    &:hover { background: $ink-700; }
+  }
+
+  &--submit {
+    background: linear-gradient(135deg, $gold, $gold-deep);
+    color: $ink-900;
+    box-shadow: 0 10px 24px -12px rgba(201, 162, 39, 0.6);
+
+    &:hover:not(:disabled) { box-shadow: 0 14px 28px -12px rgba(201, 162, 39, 0.75); }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+
+  @media (max-width: 420px) {
+    width: 100%;
+  }
+
+  @media (max-width: 320px) {
+    padding: 12px 20px;
+    font-size: 0.85rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reduced motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .add-car__section { animation: none; }
+  * { transition-duration: 0.01ms !important; }
 }
