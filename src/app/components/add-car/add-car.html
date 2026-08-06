@@ -1,10 +1,41 @@
+<!-- add-car.html — fixed broken-image src, added inline field-hint usage -->
 <div class="add-car">
 
-  <!-- ============================================= -->
-  <!-- LEFT RAIL -->
-  <!-- ============================================= -->
   <aside class="add-car__rail">
-    <div class="add-car__rail-header">{{ 'addCar.savedListings' | translate }}</div>
+    <button type="button" class="add-car__rail-header" [class.add-car__rail-header--open]="savedListingsOpen()"
+      (click)="toggleSavedListings()"
+      [attr.aria-label]="savedListingsOpen() ? ('addCar.hideSavedListings' | translate) : ('addCar.showSavedListings' | translate)">
+      {{ 'addCar.savedListings' | translate }}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </button>
+
+    @if (savedListingsOpen()) {
+    <div class="add-car__saved-panel">
+      @if (savedListingsLoading()) {
+      <div class="add-car__saved-loading">{{ 'home.loading' | translate }}</div>
+      } @else if (savedListingsError()) {
+      <div class="add-car__saved-error">{{ savedListingsError() }}</div>
+      } @else if (savedListings().length === 0) {
+      <div class="add-car__saved-empty">{{ 'addCar.noSavedListings' | translate }}</div>
+      } @else {
+      @for (car of savedListings(); track car.id) {
+      <button type="button" class="add-car__saved-item" (click)="goToSavedListing(car.id)">
+        @if (car.carImg) {
+        <img [src]="imageBaseUrl + car.carImg" [alt]="car.carModel" />
+        } @else {
+        <span class="add-car__saved-item-noimg"></span>
+        }
+        <div>
+          <strong>{{ car.carModel }}</strong>
+          <span>{{ car.carPrice }} ₾ · {{ car.city }}</span>
+        </div>
+      </button>
+      }
+      }
+    </div>
+    }
 
     <nav class="add-car__rail-steps">
       @for (s of railSteps; track s.step) {
@@ -22,43 +53,47 @@
     </nav>
 
     <div class="add-car__rail-preview">
-      <div class="add-car__rail-preview-art">
+      <p class="add-car__rail-preview-label">{{ 'addCar.title' | translate }}</p>
+
+      <div class="add-car__rail-preview-img">
+        @if (previewImage()) {
+        <img [src]="previewImage()!" alt="" />
+        } @else {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M5 17h14M6 17v-4l1.5-4.5A2 2 0 0 1 9.4 7h5.2a2 2 0 0 1 1.9 1.5L18 13v4M6 17a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0zM15 17a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0z" />
         </svg>
+        }
+        @if (previewCar().carType) {
+        <span class="add-car__rail-preview-badge">{{ previewCar().carType }}</span>
+        }
       </div>
-      <div class="add-car__rail-preview-bars">
-        <span></span>
-        <span></span>
+
+      <div class="add-car__rail-preview-body">
+        @if (previewCar().carModel) {
+        <h3>{{ previewCar().carModel }}</h3>
+        } @else {
+        <h3 class="add-car__rail-preview-placeholder">{{ 'addCar.pickManufacturer' | translate }}</h3>
+        }
+
+        <p class="add-car__rail-preview-location">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3">
+            <path d="M8 14s5-4.2 5-8a5 5 0 10-10 0c0 3.8 5 8 5 8z" />
+            <circle cx="8" cy="6" r="1.6" />
+          </svg>
+          {{ previewCar().city || '—' }}
+        </p>
+
+        <p class="add-car__rail-preview-price">{{ previewCar().carPrice || 0 }} ₾</p>
+        <p class="add-car__rail-preview-meta">{{ previewCar().fuelType || '—' }} · {{ previewCar().carAge || '—' }}</p>
       </div>
     </div>
   </aside>
 
-  <!-- ============================================= -->
-  <!-- MAIN COLUMN -->
-  <!-- ============================================= -->
   <div class="add-car__main">
 
-    <div class="add-car__tabs">
-      <button type="button" class="add-car__tab add-car__tab--active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 17h14M4 17v-4l1.8-5A2 2 0 0 1 7.7 6.6h8.6a2 2 0 0 1 1.9 1.4L20 13v4M5 17a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0zM16 17a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0z" />
-        </svg>
-        {{ 'addCar.tabCars' | translate }}
-      </button>
-      <button type="button" class="add-car__tab">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 17V9a1 1 0 0 1 1-1h9l4 4h3a1 1 0 0 1 1 1v4M3 17a1.6 1.6 0 1 0 3.2 0 1.6 1.6 0 1 0-3.2 0zM15 17a1.6 1.6 0 1 0 3.2 0 1.6 1.6 0 1 0-3.2 0zM3 13h13" />
-        </svg>
-        {{ 'addCar.tabCustom' | translate }}
-      </button>
-      <button type="button" class="add-car__tab">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="5.5" cy="17" r="2.6" /><circle cx="18.5" cy="17" r="2.6" />
-          <path d="M5.5 17l4-9h4l-2 4h4l2.5 5M9.5 8h4" />
-        </svg>
-        {{ 'addCar.tabMoto' | translate }}
-      </button>
+    <div class="add-car__heading">
+      <h1>{{ 'addCar.title' | translate }}</h1>
+      <p>{{ 'addCar.subtitle' | translate }}</p>
     </div>
 
     <div class="add-car__saletype-row">
@@ -74,13 +109,6 @@
           {{ 'addCar.forRent' | translate }}
         </button>
       </div>
-
-      <button type="button" class="add-car__loan-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2L2 19h20L12 2zM12 9v5M12 17h.01" />
-        </svg>
-        {{ 'addCar.loanCta' | translate }}
-      </button>
     </div>
 
     <div class="add-car__vin">
@@ -125,7 +153,6 @@
 
     <form [formGroup]="form" (ngSubmit)="submit()" class="add-car__form">
 
-      <!-- STEP 1: Primary Features -->
       @if (step() === 1) {
       <section class="add-car__section">
         <div class="add-car__section-head">
@@ -137,7 +164,7 @@
           </span>
           <span class="add-car__section-meta">
             {{ 'addCar.information' | translate }} {{ filledCount() }} / {{ (stepFieldNames)[1]?.length || 8 }}
-            <span class="add-car__progress-ring"></span>
+            <span class="add-car__progress-ring" [class.add-car__progress-ring--complete]="isStepValid(1)"></span>
           </span>
         </div>
 
@@ -155,6 +182,9 @@
                 </select>
                 <svg class="add-car__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
               </div>
+              @if (form.get('manufacturer')?.invalid && form.get('manufacturer')?.touched) {
+              <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+              }
             </div>
 
             <div class="add-car__field">
@@ -163,6 +193,9 @@
                 [class.add-car__control--invalid]="form.get('carModel')?.invalid && form.get('carModel')?.touched">
                 <input type="text" formControlName="carModel" placeholder="{{ 'filter.model' | translate }}" />
               </div>
+              @if (form.get('carModel')?.invalid && form.get('carModel')?.touched) {
+              <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+              }
             </div>
           </div>
 
@@ -173,6 +206,9 @@
                 [class.add-car__control--invalid]="form.get('carAge')?.invalid && form.get('carAge')?.touched">
                 <input type="text" formControlName="carAge" placeholder="2020" inputmode="numeric" />
               </div>
+              @if (form.get('carAge')?.invalid && form.get('carAge')?.touched) {
+              <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+              }
             </div>
 
             <div class="add-car__field">
@@ -181,6 +217,9 @@
                 [class.add-car__control--invalid]="form.get('carType')?.invalid && form.get('carType')?.touched">
                 <input type="text" formControlName="carType" placeholder="{{ 'addCar.trim' | translate }}" />
               </div>
+              @if (form.get('carType')?.invalid && form.get('carType')?.touched) {
+              <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+              }
             </div>
           </div>
 
@@ -197,6 +236,9 @@
                 </select>
                 <svg class="add-car__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
               </div>
+              @if (form.get('fuelType')?.invalid && form.get('fuelType')?.touched) {
+              <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+              }
             </div>
 
             <div class="add-car__field">
@@ -205,10 +247,13 @@
                 [class.add-car__control--invalid]="form.get('engineVolume')?.invalid && form.get('engineVolume')?.touched">
                 <input type="text" formControlName="engineVolume" placeholder="2.0" inputmode="decimal" />
               </div>
+              @if (form.get('engineVolume')?.invalid && form.get('engineVolume')?.touched) {
+              <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+              }
             </div>
           </div>
 
-          <div class="add-car__field" style="margin-bottom: 18px;">
+          <div class="add-car__field">
             <label class="add-car__field-label">{{ 'filter.cylinders' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__pill-group">
               @for (c of cylindersList; track c) {
@@ -218,18 +263,20 @@
             </div>
           </div>
 
-          <div class="add-car__field">
+          <div class="add-car__field" style="margin-bottom: 0;">
             <label class="add-car__field-label">{{ 'addCar.mileage' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__control"
               [class.add-car__control--invalid]="form.get('mileage')?.invalid && form.get('mileage')?.touched">
               <input type="text" formControlName="mileage" placeholder="68000" inputmode="numeric" />
             </div>
+            @if (form.get('mileage')?.invalid && form.get('mileage')?.touched) {
+            <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+            }
           </div>
         </div>
       </section>
       }
 
-      <!-- STEP 2: Technical details -->
       @if (step() === 2) {
       <section class="add-car__section">
         <div class="add-car__section-head">
@@ -241,12 +288,12 @@
           </span>
           <span class="add-car__section-meta">
             {{ 'addCar.information' | translate }} {{ filledCount() }} / {{ (stepFieldNames)[2]?.length || 5 }}
-            <span class="add-car__progress-ring"></span>
+            <span class="add-car__progress-ring" [class.add-car__progress-ring--complete]="isStepValid(2)"></span>
           </span>
         </div>
 
         <div class="add-car__section-body">
-          <div class="add-car__field" style="margin-bottom: 18px;">
+          <div class="add-car__field">
             <label class="add-car__field-label">{{ 'filter.transmission' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__pill-group">
               @for (t of transmissionList; track t) {
@@ -256,7 +303,7 @@
             </div>
           </div>
 
-          <div class="add-car__field" style="margin-bottom: 18px;">
+          <div class="add-car__field">
             <label class="add-car__field-label">{{ 'filter.driveWheels' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__pill-group">
               <button type="button" class="add-car__pill" [class.add-car__pill--active]="form.value.driveType === 'წინა'"
@@ -268,7 +315,7 @@
             </div>
           </div>
 
-          <div class="add-car__field" style="margin-bottom: 18px;">
+          <div class="add-car__field">
             <label class="add-car__field-label">{{ 'filter.numberOfDoors' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__pill-group">
               @for (d of ['2/3','4/5','>5']; track d) {
@@ -278,7 +325,7 @@
             </div>
           </div>
 
-          <div class="add-car__field" style="margin-bottom: 18px;">
+          <div class="add-car__field">
             <label class="add-car__field-label">{{ 'filter.airbags' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__pill-group">
               @for (a of airbagsList; track a) {
@@ -288,7 +335,7 @@
             </div>
           </div>
 
-          <div class="add-car__field" style="margin-bottom: 18px;">
+          <div class="add-car__field">
             <label class="add-car__field-label">{{ 'filter.wheel' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__pill-group">
               <button type="button" class="add-car__pill" [class.add-car__pill--active]="form.value.steeringWheel === 'მარცხენა'"
@@ -323,7 +370,6 @@
       </section>
       }
 
-      <!-- STEP 3: Appearance + photos -->
       @if (step() === 3) {
       <section class="add-car__section">
         <div class="add-car__section-head">
@@ -336,12 +382,12 @@
           </span>
           <span class="add-car__section-meta">
             {{ 'addCar.information' | translate }} {{ filledCount() }} / {{ (stepFieldNames)[3]?.length || 3 }}
-            <span class="add-car__progress-ring"></span>
+            <span class="add-car__progress-ring" [class.add-car__progress-ring--complete]="isStepValid(3)"></span>
           </span>
         </div>
 
         <div class="add-car__section-body">
-          <div class="add-car__field" style="margin-bottom: 18px;">
+          <div class="add-car__field">
             <label class="add-car__field-label">{{ 'filter.carColor' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__pill-group">
               @for (c of carColorList; track c) {
@@ -351,7 +397,7 @@
             </div>
           </div>
 
-          <div class="add-car__field" style="margin-bottom: 18px;">
+          <div class="add-car__field">
             <label class="add-car__field-label">{{ 'filter.interiorMaterialColor' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__pill-group">
               @for (m of interiorMaterialList; track m) {
@@ -361,7 +407,7 @@
             </div>
           </div>
 
-          <div class="add-car__field" style="margin-bottom: 4px;">
+          <div class="add-car__field">
             <label class="add-car__field-label">{{ 'addCar.interiorColor' | translate }}<span class="add-car__required">*</span></label>
             <div class="add-car__pill-group">
               @for (c of carColorList; track c) {
@@ -371,29 +417,33 @@
             </div>
           </div>
 
-          <div class="add-car__field" style="margin-top: 18px;">
+          <div class="add-car__field" style="margin-bottom: 0;">
             <label class="add-car__field-label">
-              {{ 'addCar.photos' | translate }} ({{ selectedImages().length }}/6)
+              {{ 'addCar.photos' | translate }} ({{ selectedImages().length }}/{{ maxImages }})
               <span class="add-car__required">*</span>
             </label>
             <input type="file" accept="image/jpeg,image/png,image/webp" multiple
-              [disabled]="selectedImages().length >= 6"
+              [disabled]="selectedImages().length >= maxImages"
               (change)="onImagesSelected($event)" />
+            <p class="add-car__photo-hint">{{ 'addCar.photoHint' | translate }}</p>
 
+            @if (imagePreviews().length > 0) {
             <div class="add-car__photo-grid">
               @for (preview of imagePreviews(); track $index) {
-              <div class="add-car__photo-thumb">
+              <div class="add-car__photo-thumb" [class.add-car__photo-thumb--cover]="$index === 0">
                 <img [src]="preview" alt="preview" />
                 <button type="button" (click)="removeImage($index)">×</button>
               </div>
               }
             </div>
+            } @else {
+            <p class="add-car__photo-hint">{{ 'addCar.noPhotosSelected' | translate }}</p>
+            }
           </div>
         </div>
       </section>
       }
 
-      <!-- STEP 4: Listing details -->
       @if (step() === 4) {
       <section class="add-car__section">
         <div class="add-car__section-head">
@@ -405,7 +455,7 @@
           </span>
           <span class="add-car__section-meta">
             {{ 'addCar.information' | translate }} {{ filledCount() }} / {{ (stepFieldNames)[4]?.length || 3 }}
-            <span class="add-car__progress-ring"></span>
+            <span class="add-car__progress-ring" [class.add-car__progress-ring--complete]="isStepValid(4)"></span>
           </span>
         </div>
 
@@ -417,6 +467,9 @@
                 [class.add-car__control--invalid]="form.get('city')?.invalid && form.get('city')?.touched">
                 <input type="text" formControlName="city" placeholder="{{ 'filter.location' | translate }}" />
               </div>
+              @if (form.get('city')?.invalid && form.get('city')?.touched) {
+              <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+              }
             </div>
 
             <div class="add-car__field">
@@ -425,10 +478,13 @@
                 [class.add-car__control--invalid]="form.get('carPrice')?.invalid && form.get('carPrice')?.touched">
                 <input type="number" formControlName="carPrice" placeholder="0" min="1" />
               </div>
+              @if (form.get('carPrice')?.invalid && form.get('carPrice')?.touched) {
+              <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+              }
             </div>
           </div>
 
-          <div class="add-car__field add-car__field--toggle" style="margin-bottom: 16px;">
+          <div class="add-car__field add-car__field--toggle">
             <label>{{ 'filter.exchange' | translate }}</label>
             <span class="add-car__switch" [class.add-car__switch--on]="form.value.isExchangePossible"
               (click)="form.patchValue({ isExchangePossible: !form.value.isExchangePossible })">
@@ -443,6 +499,9 @@
                 [class.add-car__control--invalid]="form.get('userPhone')?.invalid && form.get('userPhone')?.touched">
                 <input type="text" formControlName="userPhone" placeholder="5XX XX XX XX" inputmode="tel" />
               </div>
+              @if (form.get('userPhone')?.invalid && form.get('userPhone')?.touched) {
+              <p class="add-car__field-hint">{{ 'addCar.fieldRequired' | translate }}</p>
+              }
             </div>
 
             <div class="add-car__field">

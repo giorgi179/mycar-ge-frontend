@@ -10,17 +10,23 @@ import { CarAddRequest, CarModels } from './components';
 })
 export class AddCarServices {
   private http = inject(HttpClient);
+  // environment.apiUrl already ends in "/api" (see environment.ts),
+  // so every path below must NOT repeat "/api" again — the previous
+  // version built ".../api/api/Car/add-car" and 404'd on every call.
   private api = environment.apiUrl;
 
   getManufacturers(): Observable<{ name: string }[]> {
     return this.http.get<{ name: string }[]>(`${this.api}/Car/get-manufacturers`);
   }
 
-  getUserCars(userId: number): Observable<CarModels[]> {
-    return this.http.get<CarModels[]>(`${this.api}/api/Car/user/${userId}`);
+  // Backend reads the user id off the auth token's claims, so no id
+  // needs to (or can) be passed in — the endpoint always returns only
+  // the logged-in user's own listings.
+  getMyCars(): Observable<CarModels[]> {
+    return this.http.get<CarModels[]>(`${this.api}/Car/get-my-cars`);
   }
 
-  addCar(request: CarAddRequest): Observable<any> {
+  addCar(request: CarAddRequest): Observable<{ message: string; carId: number }> {
     const formData = new FormData();
 
     formData.append('City', request.city);
@@ -55,6 +61,6 @@ export class AddCarServices {
       formData.append('Images', file, file.name);
     });
 
-    return this.http.post(`${this.api}/api/Car/add-car`, formData);
+    return this.http.post<{ message: string; carId: number }>(`${this.api}/Car/add-car`, formData);
   }
 }

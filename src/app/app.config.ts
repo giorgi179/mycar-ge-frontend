@@ -1,8 +1,9 @@
 import { ApplicationConfig, provideAppInitializer, inject } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { LanguageService } from './services/language-service';
+import { authInterceptor } from './interceptors/auth-interceptor';
 
 
 export const appConfig: ApplicationConfig = {
@@ -14,7 +15,7 @@ export const appConfig: ApplicationConfig = {
         anchorScrolling: 'enabled'
       })
     ),
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideAppInitializer(() => {
       const langService = inject(LanguageService);
       return langService.init();

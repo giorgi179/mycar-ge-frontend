@@ -1,64 +1,40 @@
-// =========================================================
-// Add Car — multi-step listing form
-// Style: myauto.ge sell-flow — dark sidebar rail with step
-// progress, white content card, dropdown-style fields with
-// 2-col grid, mint "Add by VIN" callout, orange CTA accents
-// =========================================================
+// add-car.scss — polished visuals, dead selectors removed
+// (add-car__success, add-car__pill-group--invalid dropped —
+// never referenced anywhere in the HTML)
 
 @use 'sass:color';
 
-// ---- palette, lifted directly off the reference ----
-$c-sidebar:        #241c3d;   // "Saved listings" header + rail bg
-$c-sidebar-line:    rgba(255, 255, 255, 0.14);
-$c-sidebar-text:    #b9b3cf;
-$c-sidebar-text-active: #ffffff;
+:host {
+  --accent: #c4a661;
+  --accent-dark: #a3843f;
+  --ink: #0f1b14;
+  --border-color: #e8e5dd;
+  --text-primary: #14201a;
+  --text-muted: #767b74;
+  --bg-subtle: #f7f5f0;
+  --danger: #8b2e2e;
+  --danger-soft: #f7e9e9;
+  --success: #3f7a4e;
+  --success-soft: #eaf3ec;
 
-$c-canvas:          #eef0f4;
-$c-surface:         #ffffff;
-$c-border:          #e4e7ee;
-$c-border-strong:   #d3d7e0;
+  display: block;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
 
-$c-text:            #1c2333;
-$c-text-dim:        #6b7280;
-$c-text-faint:      #a3a9b7;
-
-$c-accent-orange:   #f0672c;   // "Cars" tab, radio, VIN "Add" btn
-$c-accent-orange-soft: #fdece4;
-$c-accent-blue:     #2196f3;   // loan CTA
-$c-accent-blue-dark: #1a7fd1;
-
-$c-mint:            #cdeede;   // VIN banner bg
-$c-mint-line:       rgba(18, 135, 90, 0.18);
-$c-mint-text:       #0f7a4f;
-
-$c-required:        #e0483e;
-
-$c-success:         #22b573;
-$c-success-soft:    #e6f8ef;
-
-$c-error:           #d92d20;
-$c-error-soft:      #fdeeed;
-
-$radius-sm:   8px;
-$radius-md:   12px;
-$radius-lg:   14px;
-
-$font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-
-$shadow-card:  0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
-$shadow-raised: 0 4px 14px rgba(33, 150, 243, 0.28);
-$transition:   150ms ease;
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 12px;
+$font-head: 'Barlow Condensed', 'Inter', sans-serif;
+$shadow-card: 0 1px 2px rgba(15, 27, 20, 0.05), 0 4px 14px rgba(15, 27, 20, 0.04);
+$shadow-card-hover: 0 6px 20px rgba(15, 27, 20, 0.09);
+$transition: 150ms ease;
 
 @mixin focus-ring {
   &:focus-visible {
-    outline: 2px solid $c-accent-blue;
+    outline: 2px solid var(--accent-dark);
     outline-offset: 2px;
   }
 }
-
-// =========================================================
-// Root — two-column shell: dark step rail + content
-// =========================================================
 
 .add-car {
   display: grid;
@@ -67,9 +43,8 @@ $transition:   150ms ease;
   max-width: 1180px;
   margin: 0 auto;
   padding: 32px 24px 72px;
-  color: $c-text;
-  font-family: $font-body;
-  background: $c-canvas;
+  color: var(--text-primary);
+  background: var(--bg-subtle);
   align-items: start;
 
   @media (max-width: 860px) {
@@ -82,9 +57,6 @@ $transition:   150ms ease;
     padding: 14px 8px 48px;
   }
 
-  // ---------------------------------------------------
-  // Left rail — "Saved listings" + numbered step trail
-  // ---------------------------------------------------
   &__rail {
     display: flex;
     flex-direction: column;
@@ -98,23 +70,52 @@ $transition:   150ms ease;
   }
 
   &__rail-header {
-    background: $c-sidebar;
-    color: $c-sidebar-text-active;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--ink);
+    color: #fff;
+    font-family: $font-head;
     font-weight: 600;
-    font-size: 0.92rem;
-    text-align: center;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-align: left;
     padding: 15px 16px;
     border-radius: $radius-md;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    transition: background $transition, box-shadow $transition;
+    @include focus-ring;
+
+    &:hover {
+      background: color.adjust(#0f1b14, $lightness: 6%);
+      box-shadow: 0 4px 14px rgba(15, 27, 20, 0.22);
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--accent);
+      transition: transform $transition;
+    }
+
+    &--open svg {
+      transform: rotate(180deg);
+    }
 
     @media (max-width: 320px) {
       padding: 12px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
   }
 
   &__rail-steps {
-    background: $c-surface;
-    border: 1px solid $c-border;
+    background: #fff;
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
     padding: 20px 18px;
     box-shadow: $shadow-card;
@@ -131,7 +132,7 @@ $transition:   150ms ease;
     background: transparent;
     width: 100%;
     text-align: left;
-    font-family: $font-body;
+    font-family: inherit;
     @include focus-ring;
 
     &:last-child {
@@ -148,8 +149,8 @@ $transition:   150ms ease;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: 2px solid $c-border-strong;
-    background: $c-surface;
+    border: 2px solid var(--border-color);
+    background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -174,13 +175,13 @@ $transition:   150ms ease;
     top: 22px;
     bottom: 2px;
     width: 1px;
-    background: $c-border-strong;
+    background: var(--border-color);
   }
 
   &__rail-label {
     font-size: 0.9rem;
     font-weight: 500;
-    color: $c-text-faint;
+    color: color.adjust(#767b74, $lightness: 8%);
     line-height: 1.35;
     padding-top: 1px;
     transition: color $transition;
@@ -189,7 +190,7 @@ $transition:   150ms ease;
   &__rail-step {
     &--current {
       .add-car__rail-marker {
-        border-color: $c-accent-blue;
+        border-color: var(--accent-dark);
 
         &::after {
           content: '';
@@ -197,20 +198,20 @@ $transition:   150ms ease;
           width: 9px;
           height: 9px;
           border-radius: 50%;
-          background: $c-accent-blue;
+          background: var(--accent-dark);
         }
       }
 
       .add-car__rail-label {
-        color: $c-text;
+        color: var(--text-primary);
         font-weight: 700;
       }
     }
 
     &--done {
       .add-car__rail-marker {
-        border-color: $c-success;
-        background: $c-success;
+        border-color: var(--success);
+        background: var(--success);
 
         svg {
           opacity: 1;
@@ -218,89 +219,203 @@ $transition:   150ms ease;
       }
 
       .add-car__rail-connector {
-        background: $c-success;
+        background: var(--success);
       }
 
       .add-car__rail-label {
-        color: $c-text-dim;
+        color: var(--text-muted);
       }
     }
   }
 
-  // ---------------------------------------------------
-  // Rail preview card — quiet placeholder like reference
-  // ---------------------------------------------------
   &__rail-preview {
-    background: $c-surface;
-    border: 1px solid $c-border;
+    background: #fff;
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
-    padding: 14px;
+    overflow: hidden;
     box-shadow: $shadow-card;
+    transition: box-shadow $transition;
+
+    &:hover {
+      box-shadow: $shadow-card-hover;
+    }
   }
 
-  &__rail-preview-art {
-    height: 150px;
-    border-radius: $radius-sm;
-    background: $c-canvas;
+  &__rail-preview-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 12px 14px 0;
+  }
+
+  &__rail-preview-img {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: var(--bg-subtle);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $c-text-faint;
-    margin-bottom: 12px;
+    color: color.adjust(#767b74, $lightness: 20%);
+    margin: 8px 0 0;
+    border-bottom: 3px solid var(--accent);
+    overflow: hidden;
 
     svg {
       width: 42px;
       height: 42px;
     }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
-  &__rail-preview-bars {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
+  &__rail-preview-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 3px 9px;
+    background: rgba(15, 27, 20, 0.78);
+    backdrop-filter: blur(3px);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
 
-    span {
-      display: block;
-      height: 7px;
-      border-radius: 4px;
-      background: $c-border;
+  &__rail-preview-body {
+    padding: 14px;
 
-      &:nth-child(1) { width: 70%; }
-      &:nth-child(2) { width: 42%; }
+    h3 {
+      margin: 0 0 6px;
+      font-family: $font-head;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+
+      &.add-car__rail-preview-placeholder {
+        color: color.adjust(#767b74, $lightness: 22%);
+        font-weight: 500;
+        text-transform: none;
+        font-family: inherit;
+        font-size: 0.88rem;
+      }
     }
+  }
+
+  &__rail-preview-location {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+
+    svg {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
+    }
+  }
+
+  &__rail-preview-price {
+    margin: 0 0 2px;
+    font-family: $font-head;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-dark);
   }
 
   &__rail-preview-meta {
+    margin: 0;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+  }
+
+  &__saved-panel {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: $radius-md;
+    box-shadow: $shadow-card;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
 
-    div {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+  &__saved-empty,
+  &__saved-loading,
+  &__saved-error {
+    padding: 14px 6px;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  &__saved-error {
+    color: var(--danger);
+  }
+
+  &__saved-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    transition: background $transition;
+    text-align: left;
+    border: none;
+    background: none;
+    width: 100%;
+    font-family: inherit;
+    @include focus-ring;
+
+    &:hover {
+      background: var(--bg-subtle);
     }
 
-    svg {
-      width: 14px;
-      height: 14px;
-      color: $c-text-faint;
+    img,
+    &-noimg {
+      width: 48px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 4px;
       flex-shrink: 0;
+      background: var(--bg-subtle);
+    }
+
+    div {
+      min-width: 0;
+    }
+
+    strong {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     span {
       display: block;
-      height: 6px;
-      border-radius: 4px;
-      background: $c-border;
-      flex: 1;
+      font-size: 0.76rem;
+      color: var(--text-muted);
     }
   }
 
-  // ---------------------------------------------------
-  // Main column
-  // ---------------------------------------------------
   &__main {
     display: flex;
     flex-direction: column;
@@ -308,66 +423,32 @@ $transition:   150ms ease;
     min-width: 0;
   }
 
-  // ---- vehicle-type tabs ----
-  &__tabs {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    background: $c-surface;
-    border: 1px solid $c-border;
-    border-radius: $radius-md;
-    padding: 18px 22px 0;
-    box-shadow: $shadow-card;
-    overflow-x: auto;
+  &__heading {
+    h1 {
+      font-family: $font-head;
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: var(--text-primary);
+      margin: 0 0 4px;
+    }
 
-    @media (max-width: 480px) {
-      gap: 20px;
-      padding: 14px 16px 0;
+    p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0;
     }
   }
 
-  &__tab {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border: none;
-    background: transparent;
-    color: $c-text-dim;
-    font-family: $font-body;
-    font-weight: 600;
-    font-size: 0.92rem;
-    padding: 0 2px 16px;
-    cursor: pointer;
-    white-space: nowrap;
-    border-bottom: 2px solid transparent;
-    transition: color $transition, border-color $transition;
-    @include focus-ring;
-
-    svg {
-      width: 19px;
-      height: 19px;
-    }
-
-    &:hover {
-      color: $c-text;
-    }
-
-    &--active {
-      color: $c-accent-orange;
-      border-bottom-color: $c-accent-orange;
-    }
-  }
-
-  // ---- sale/rent + loan CTA row ----
   &__saletype-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    background: $c-surface;
-    border: 1px solid $c-border;
+    background: #fff;
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
-    padding: 18px 22px;
+    padding: 16px 20px;
     box-shadow: $shadow-card;
     flex-wrap: wrap;
 
@@ -386,20 +467,20 @@ $transition:   150ms ease;
     align-items: center;
     gap: 9px;
     cursor: pointer;
-    font-size: 0.92rem;
-    color: $c-text-dim;
+    font-size: 0.9rem;
+    color: var(--text-muted);
     font-weight: 500;
     background: none;
     border: none;
     padding: 0;
-    font-family: $font-body;
+    font-family: inherit;
     @include focus-ring;
 
     &-dot {
-      width: 19px;
-      height: 19px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      border: 2px solid $c-border-strong;
+      border: 2px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -408,20 +489,20 @@ $transition:   150ms ease;
 
       &::after {
         content: '';
-        width: 9px;
-        height: 9px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
-        background: $c-accent-orange;
+        background: var(--accent-dark);
         opacity: 0;
         transition: opacity $transition;
       }
     }
 
     &--active {
-      color: $c-text;
+      color: var(--text-primary);
 
       .add-car__radio-dot {
-        border-color: $c-accent-orange;
+        border-color: var(--accent-dark);
 
         &::after {
           opacity: 1;
@@ -430,43 +511,15 @@ $transition:   150ms ease;
     }
   }
 
-  &__loan-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: none;
-    background: $c-accent-blue;
-    color: #fff;
-    font-family: $font-body;
-    font-weight: 700;
-    font-size: 0.9rem;
-    padding: 13px 20px;
-    border-radius: $radius-sm;
-    cursor: pointer;
-    box-shadow: $shadow-raised;
-    transition: background $transition;
-    @include focus-ring;
-
-    svg {
-      width: 17px;
-      height: 17px;
-    }
-
-    &:hover {
-      background: $c-accent-blue-dark;
-    }
-  }
-
-  // ---- Add by VIN banner ----
   &__vin {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    background: $c-mint;
-    border: 1px solid $c-mint-line;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-color);
     border-radius: $radius-lg;
-    padding: 24px 26px;
+    padding: 22px 24px;
     flex-wrap: wrap;
 
     @media (max-width: 620px) {
@@ -482,26 +535,27 @@ $transition:   150ms ease;
       align-items: center;
       gap: 10px;
       margin: 0 0 6px;
-      font-size: 1.02rem;
+      font-family: $font-head;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: $c-text;
+      color: var(--text-primary);
     }
 
     p {
       margin: 0;
       font-size: 0.85rem;
-      color: color.adjust($c-mint-text, $lightness: -8%);
+      color: var(--text-muted);
       line-height: 1.5;
     }
   }
 
   &__vin-badge {
-    background: $c-mint-text;
+    background: var(--accent-dark);
     color: #fff;
-    font-size: 0.68rem;
+    font-size: 0.66rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
     padding: 3px 9px;
     border-radius: 20px;
   }
@@ -536,52 +590,57 @@ $transition:   150ms ease;
     svg {
       position: absolute;
       right: 13px;
-      width: 17px;
-      height: 17px;
-      color: $c-text-faint;
+      width: 16px;
+      height: 16px;
+      color: color.adjust(#767b74, $lightness: 15%);
       pointer-events: none;
     }
 
     input {
       width: 240px;
-      background: $c-surface;
-      border: 1px solid $c-border-strong;
+      background: #fff;
+      border: 1px solid var(--border-color);
       border-radius: $radius-sm;
       padding: 12px 38px 12px 14px;
-      font-family: $font-body;
+      font-family: inherit;
       font-size: 0.88rem;
-      color: $c-text;
+      color: var(--text-primary);
       box-sizing: border-box;
       height: 46px;
+      transition: border-color $transition, box-shadow $transition;
       @include focus-ring;
+
+      &:focus {
+        border-color: var(--accent-dark);
+        box-shadow: 0 0 0 3px rgba(163, 132, 63, 0.14);
+      }
 
       @media (max-width: 480px) {
         width: 100%;
       }
 
       &::placeholder {
-        color: $c-text-faint;
+        color: color.adjust(#767b74, $lightness: 18%);
       }
     }
   }
 
   &__vin-add-btn {
     border: none;
-    background: $c-accent-orange-soft;
-    color: $c-accent-orange;
-    font-family: $font-body;
+    background: var(--ink);
+    color: #fff;
+    font-family: inherit;
     font-weight: 700;
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     padding: 0 24px;
     height: 46px;
     border-radius: $radius-sm;
     cursor: pointer;
-    transition: background $transition, color $transition;
+    transition: background $transition;
     @include focus-ring;
 
     &:hover {
-      background: $c-accent-orange;
-      color: #fff;
+      background: color.adjust(#0f1b14, $lightness: 8%);
     }
   }
 
@@ -591,17 +650,17 @@ $transition:   150ms ease;
     gap: 6px;
     background: none;
     border: none;
-    color: $c-text;
-    font-family: $font-body;
-    font-size: 0.8rem;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.78rem;
     font-weight: 500;
     cursor: pointer;
     padding: 2px 0;
     @include focus-ring;
 
     svg {
-      width: 15px;
-      height: 15px;
+      width: 14px;
+      height: 14px;
     }
 
     &:hover {
@@ -609,21 +668,22 @@ $transition:   150ms ease;
     }
   }
 
-  // ---------------------------------------------------
-  // Error banner
-  // ---------------------------------------------------
   &__error {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: $c-error-soft;
-    border: 1px solid rgba($c-error, 0.25);
-    color: $c-error;
+    background: var(--danger-soft);
+    border: 1px solid rgba(139, 46, 46, 0.2);
+    color: var(--danger);
     border-radius: $radius-sm;
     padding: 13px 16px;
     font-size: 0.88rem;
     font-weight: 500;
     margin: 0;
+
+    svg {
+      flex-shrink: 0;
+    }
 
     @media (max-width: 320px) {
       padding: 10px 12px;
@@ -631,9 +691,6 @@ $transition:   150ms ease;
     }
   }
 
-  // ---------------------------------------------------
-  // Form shell / section card
-  // ---------------------------------------------------
   &__form {
     display: flex;
     flex-direction: column;
@@ -641,8 +698,8 @@ $transition:   150ms ease;
   }
 
   &__section {
-    background: $c-surface;
-    border: 1px solid $c-border;
+    background: #fff;
+    border: 1px solid var(--border-color);
     border-radius: $radius-lg;
     box-shadow: $shadow-card;
     animation: fadeSlideIn 220ms ease;
@@ -666,7 +723,7 @@ $transition:   150ms ease;
     justify-content: space-between;
     gap: 12px;
     padding: 20px 24px;
-    border-bottom: 1px solid $c-border;
+    border-bottom: 1px solid var(--border-color);
 
     @media (max-width: 480px) {
       padding: 16px 18px;
@@ -677,14 +734,16 @@ $transition:   150ms ease;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.02rem;
+    font-family: $font-head;
+    font-size: 1.15rem;
     font-weight: 700;
-    color: $c-text;
+    letter-spacing: 0.01em;
+    color: var(--text-primary);
 
     svg {
       width: 19px;
       height: 19px;
-      color: $c-text-dim;
+      color: var(--accent-dark);
       flex-shrink: 0;
     }
   }
@@ -692,27 +751,27 @@ $transition:   150ms ease;
   &__section-meta {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.82rem;
-    color: $c-text-faint;
-    font-weight: 500;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
     flex-shrink: 0;
-
-    svg:last-child {
-      width: 16px;
-      height: 16px;
-      color: $c-text-dim;
-      cursor: pointer;
-    }
+    white-space: nowrap;
   }
 
   &__progress-ring {
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    border: 2px solid $c-success-soft;
-    border-top-color: $c-success;
+    border: 2px solid var(--success-soft);
+    border-top-color: var(--success);
     flex-shrink: 0;
+    transition: border-top-color $transition;
+
+    &--complete {
+      border-top-color: var(--success);
+      border-color: var(--success);
+    }
   }
 
   &__section-body {
@@ -727,9 +786,6 @@ $transition:   150ms ease;
     }
   }
 
-  // ---------------------------------------------------
-  // Field layout — 2-column dropdown-styled grid
-  // ---------------------------------------------------
   &__row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -746,47 +802,73 @@ $transition:   150ms ease;
     }
   }
 
-  &__row--three {
-    grid-template-columns: 1fr 0.7fr 1fr;
-
-    @media (max-width: 560px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  &__row--split {
-    grid-template-columns: 1fr auto;
-    align-items: center;
-
-    @media (max-width: 560px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
   &__field {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    margin-bottom: 18px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   &__required {
-    color: $c-required;
+    color: var(--danger);
     margin-left: 2px;
   }
 
-  // Labels now live above each control (see &__field-label) rather
-  // than floating inside it — simpler, no overlap/z-index tricks,
-  // and works identically for text inputs and <select>.
   &__control {
     position: relative;
     display: flex;
     align-items: center;
     height: 48px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: $radius-sm;
+    transition: border-color $transition, box-shadow $transition;
+
+    &:hover {
+      border-color: color.adjust(#e8e5dd, $lightness: -12%);
+    }
+
+    &:focus-within {
+      border-color: var(--accent-dark);
+      box-shadow: 0 0 0 3px rgba(163, 132, 63, 0.14);
+    }
+
+    &--invalid {
+      border-color: var(--danger);
+
+      &:focus-within {
+        border-color: var(--danger);
+        box-shadow: 0 0 0 3px rgba(139, 46, 46, 0.12);
+      }
+    }
 
     input,
     select {
       width: 100%;
       height: 100%;
+      border: none;
+      background: transparent;
+      box-shadow: none !important;
+      padding: 0 15px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      appearance: none;
+
+      &:focus {
+        box-shadow: none;
+        outline: none;
+      }
+
+      &::placeholder {
+        color: color.adjust(#767b74, $lightness: 18%);
+        font-weight: 400;
+      }
     }
 
     &--has-chevron {
@@ -797,129 +879,86 @@ $transition:   150ms ease;
         transform: translateY(-50%);
         width: 15px;
         height: 15px;
-        color: $c-text-dim;
+        color: var(--text-muted);
         pointer-events: none;
         z-index: 2;
       }
 
-      input,
       select {
         padding-right: 38px;
       }
     }
   }
 
-  // ---------------------------------------------------
-  // Inputs — pill-cornered boxes that read as dropdowns
-  // ---------------------------------------------------
-  input[type='text'],
-  input[type='number'],
-  textarea,
-  select {
-    width: 100%;
-    background: $c-surface;
-    border: 1px solid $c-border-strong;
-    border-radius: $radius-sm;
-    color: $c-text;
-    font-family: $font-body;
-    font-size: 0.9rem;
-    font-weight: 500;
-    padding: 14px 15px;
-    transition: border-color $transition, box-shadow $transition;
-    box-sizing: border-box;
-    appearance: none;
-    @include focus-ring;
-
-    @media (max-width: 320px) {
-      padding: 11px 12px;
-      font-size: 0.82rem;
-    }
-
-    &::placeholder {
-      color: $c-text-faint;
-      font-weight: 400;
-    }
-
-    &:hover {
-      border-color: color.adjust($c-border-strong, $lightness: -10%);
-    }
-
-    &:focus {
-      border-color: $c-accent-blue;
-      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.12);
-      outline: none;
-    }
-  }
-
-  // the box border/bg lives on __control; the input itself stays
-  // borderless/transparent-bg so it sits flush inside that box
-  &__control {
-    background: $c-surface;
-    border: 1px solid $c-border-strong;
-    border-radius: $radius-sm;
-    transition: border-color $transition, box-shadow $transition;
-
-    &:hover {
-      border-color: color.adjust($c-border-strong, $lightness: -10%);
-    }
-
-    &:focus-within {
-      border-color: $c-accent-blue;
-      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.12);
-    }
-
-    &--invalid {
-      border-color: $c-error;
-
-      &:focus-within {
-        border-color: $c-error;
-        box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12);
-      }
-    }
-
-    input,
-    select {
-      border: none;
-      background: transparent;
-      box-shadow: none !important;
-
-      &:focus {
-        box-shadow: none;
-      }
-    }
+  &__field-hint {
+    margin-top: 6px;
+    font-size: 0.76rem;
+    color: var(--danger);
   }
 
   textarea {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: $radius-sm;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 13px 15px;
     resize: vertical;
     min-height: 110px;
     line-height: 1.55;
-    padding-top: 13px;
+    box-sizing: border-box;
+    transition: border-color $transition, box-shadow $transition;
+    @include focus-ring;
+
+    &:hover {
+      border-color: color.adjust(#e8e5dd, $lightness: -12%);
+    }
+
+    &:focus {
+      border-color: var(--accent-dark);
+      box-shadow: 0 0 0 3px rgba(163, 132, 63, 0.14);
+      outline: none;
+    }
+
+    &::placeholder {
+      color: color.adjust(#767b74, $lightness: 18%);
+    }
   }
 
   input[type='file'] {
     width: 100%;
-    color: $c-text-dim;
+    color: var(--text-muted);
     font-size: 0.82rem;
-    background: $c-canvas;
-    border: 1px dashed $c-border-strong;
+    background: var(--bg-subtle);
+    border: 1px dashed var(--border-color);
     border-radius: $radius-sm;
     padding: 15px 12px;
     box-sizing: border-box;
     cursor: pointer;
     transition: border-color $transition, background $transition;
+    font-family: inherit;
+    @include focus-ring;
 
     @media (max-width: 320px) {
       padding: 11px 9px;
       font-size: 0.74rem;
     }
 
-    &:hover {
-      border-color: $c-accent-blue;
-      background: rgba(33, 150, 243, 0.05);
+    &:hover:not(:disabled) {
+      border-color: var(--accent-dark);
+      background: rgba(196, 166, 97, 0.08);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
     }
 
     &::file-selector-button {
-      background: $c-accent-blue;
+      background: var(--ink);
       color: #fff;
       border: none;
       border-radius: 6px;
@@ -929,21 +968,19 @@ $transition:   150ms ease;
       font-size: 0.78rem;
       cursor: pointer;
       transition: background $transition;
+      font-family: inherit;
 
       &:hover {
-        background: $c-accent-blue-dark;
+        background: color.adjust(#0f1b14, $lightness: 8%);
       }
     }
   }
 
-  // ---------------------------------------------------
-  // Pill / chip selectors (technical + appearance steps)
-  // ---------------------------------------------------
   &__field-label {
     display: block;
     font-size: 0.82rem;
     font-weight: 600;
-    color: $c-text-dim;
+    color: var(--text-muted);
     margin-bottom: 9px;
 
     @media (max-width: 320px) {
@@ -965,14 +1002,15 @@ $transition:   150ms ease;
   &__pill {
     padding: 9px 15px;
     border-radius: $radius-sm;
-    border: 1px solid $c-border-strong;
-    background: $c-surface;
-    color: $c-text-dim;
+    border: 1px solid var(--border-color);
+    background: #fff;
+    color: var(--text-muted);
     font-size: 0.84rem;
     font-weight: 500;
+    font-family: inherit;
     cursor: pointer;
     white-space: nowrap;
-    transition: background $transition, border-color $transition, color $transition;
+    transition: background $transition, border-color $transition, color $transition, transform $transition;
     @include focus-ring;
 
     @media (max-width: 320px) {
@@ -981,42 +1019,19 @@ $transition:   150ms ease;
     }
 
     &:hover {
-      border-color: $c-accent-blue;
-      color: $c-accent-blue;
+      border-color: var(--accent-dark);
+      color: var(--accent-dark);
+    }
+
+    &:active {
+      transform: scale(0.97);
     }
 
     &--active {
-      background: $c-accent-blue;
-      border-color: $c-accent-blue;
+      background: var(--ink);
+      border-color: var(--ink);
       color: #fff;
       font-weight: 600;
-    }
-  }
-
-  // ---------------------------------------------------
-  // Turbo-style inline toggle chip (matches ref switch pill)
-  // ---------------------------------------------------
-  &__toggle-chip {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    height: 48px;
-    border: 1px solid $c-border-strong;
-    border-radius: $radius-sm;
-    background: $c-surface;
-    padding: 0 16px;
-    cursor: pointer;
-    font-family: $font-body;
-    font-size: 0.88rem;
-    font-weight: 500;
-    color: $c-text;
-    transition: border-color $transition;
-    white-space: nowrap;
-    @include focus-ring;
-
-    &:hover {
-      border-color: $c-text-faint;
     }
   }
 
@@ -1026,7 +1041,7 @@ $transition:   150ms ease;
     height: 20px;
     flex-shrink: 0;
     border-radius: 999px;
-    background: $c-border-strong;
+    background: var(--border-color);
     transition: background $transition;
     cursor: pointer;
 
@@ -1038,12 +1053,12 @@ $transition:   150ms ease;
       height: 16px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+      box-shadow: 0 1px 2px rgba(15, 27, 20, 0.2);
       transition: transform $transition;
     }
 
     &--on {
-      background: $c-accent-blue;
+      background: var(--accent-dark);
 
       span {
         transform: translateX(16px);
@@ -1059,14 +1074,17 @@ $transition:   150ms ease;
 
     label {
       font-size: 0.9rem;
-      color: $c-text;
+      color: var(--text-primary);
       font-weight: 500;
     }
   }
 
-  // ---------------------------------------------------
-  // Photo previews
-  // ---------------------------------------------------
+  &__photo-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
   &__photo-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1087,14 +1105,29 @@ $transition:   150ms ease;
     aspect-ratio: 4 / 3;
     border-radius: $radius-sm;
     overflow: hidden;
-    border: 1px solid $c-border;
-    background: $c-canvas;
+    border: 1px solid var(--border-color);
+    background: var(--bg-subtle);
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    &--cover::after {
+      content: 'Cover';
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+      background: rgba(15, 27, 20, 0.78);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 6px;
+      border-radius: 2px;
     }
 
     button {
@@ -1105,7 +1138,7 @@ $transition:   150ms ease;
       height: 22px;
       border-radius: 50%;
       border: none;
-      background: rgba(28, 35, 51, 0.75);
+      background: rgba(15, 27, 20, 0.75);
       color: #fff;
       font-size: 0.95rem;
       line-height: 1;
@@ -1116,14 +1149,11 @@ $transition:   150ms ease;
       transition: background $transition;
 
       &:hover {
-        background: $c-error;
+        background: var(--danger);
       }
     }
   }
 
-  // ---------------------------------------------------
-  // Navigation buttons
-  // ---------------------------------------------------
   &__nav {
     display: flex;
     justify-content: space-between;
@@ -1139,11 +1169,11 @@ $transition:   150ms ease;
     padding: 13px 20px;
     border-radius: $radius-sm;
     border: 1px solid transparent;
-    font-family: $font-body;
+    font-family: inherit;
     font-weight: 700;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: background $transition, border-color $transition, color $transition, opacity $transition;
+    transition: background $transition, border-color $transition, color $transition, opacity $transition, transform $transition;
     @include focus-ring;
 
     @media (max-width: 320px) {
@@ -1151,34 +1181,36 @@ $transition:   150ms ease;
       font-size: 0.8rem;
     }
 
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
     &--ghost {
-      background: $c-surface;
-      border-color: $c-border-strong;
-      color: $c-text-dim;
+      background: #fff;
+      border-color: var(--border-color);
+      color: var(--text-muted);
 
       &:hover {
-        border-color: $c-text-dim;
-        color: $c-text;
+        border-color: var(--text-muted);
+        color: var(--text-primary);
       }
     }
 
     &--primary {
-      background: $c-accent-blue;
+      background: var(--ink);
       color: #fff;
-      box-shadow: $shadow-raised;
 
       &:hover {
-        background: $c-accent-blue-dark;
+        background: color.adjust(#0f1b14, $lightness: 8%);
       }
     }
 
     &--submit {
-      background: $c-accent-orange;
+      background: var(--accent-dark);
       color: #fff;
-      box-shadow: 0 4px 14px rgba(240, 103, 44, 0.28);
 
       &:hover {
-        background: color.adjust($c-accent-orange, $lightness: -6%);
+        background: color.adjust(#a3843f, $lightness: -6%);
       }
 
       &:disabled {

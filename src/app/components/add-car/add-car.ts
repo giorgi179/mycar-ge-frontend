@@ -1,10 +1,13 @@
+
 import { Component, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AddCarServices } from '../../services/add-car-services';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { CarAddRequest } from '../../services/components';
+import { CarAddRequest, CarModels } from '../../services/components';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -20,6 +23,8 @@ export class AddCar {
   private api = inject(AddCarServices);
   private router = inject(Router);
 
+  imageBaseUrl = (environment as { imageUrl?: string }).imageUrl ?? '';
+
   step = signal(1);
   totalSteps = 4;
 
@@ -28,7 +33,6 @@ export class AddCar {
     { step: 2, label: 'addCar.railLocationCustoms' },
     { step: 3, label: 'addCar.railPhotoVideo' },
     { step: 4, label: 'addCar.railPrice' },
-    { step: 5, label: 'addCar.railContact' },
   ];
 
   saleType = signal<'sale' | 'rent'>('sale');
@@ -37,32 +41,30 @@ export class AddCar {
   loading = signal(false);
   error = signal<string | null>(null);
 
+  minImages = 1;
+  maxImages = 6;
+
   selectedImages = signal<File[]>([]);
   imagePreviews = signal<string[]>([]);
 
   manufacturerList = ['Toyota', 'BMW', 'Mercedes-Benz', 'Ford', 'Hyundai', 'Kia', 'Honda', 'Nissan', 'Volkswagen', 'Lexus'];
   fuelTypeList = ['ბენზინი', 'დიზელი', 'ჰიბრიდი', 'ელექტრო', 'გაზი'];
-  carCategoryList = ['სედანი', 'ჯიპი', 'უნივერსალი', 'კუპე', 'ჰეტჩბექი', 'მინივენი', 'პიკაპი', 'კაბრიოლეტი'];
   transmissionList = ['ავტომატიკა', 'მექანიკა', 'ვარიატორი'];
   cylindersList = [3, 4, 6, 8, 10, 12];
   airbagsList = [2, 4, 6, 8, 9, 10];
   carColorList = ['თეთრი', 'შავი', 'ვერცხლისფერი', 'ნაცრისფერი', 'წითელი', 'ლურჯი', 'ყავისფერი', 'ბეჟი', 'მწვანე', 'ყვითელი'];
   interiorMaterialList = ['ნაჭერი', 'ხელოვნური ტყავი', 'ალკანტარა', 'ტყავი', 'კომბინირებული'];
 
-  // Every control name below maps 1:1 onto a CarAddRequest / backend
-  // Swagger field so nothing gets silently dropped on submit.
   form = this.fb.group({
-    // Step 1 - Primary features
     manufacturer: ['', Validators.required],
     carModel: ['', Validators.required],
     carAge: ['', Validators.required],
-    carType: ['', Validators.required],       // trim/body-type text -> CarType
+    carType: ['', Validators.required],
     fuelType: ['', Validators.required],
     mileage: ['', Validators.required],
     engineVolume: ['', Validators.required],
     cylinders: [null as number | null, Validators.required],
 
-    // Step 2 - Technical details
     transmission: ['', Validators.required],
     driveType: ['', Validators.required],
     doors: ['', Validators.required],
@@ -71,12 +73,10 @@ export class AddCar {
     hasTechInspection: [false],
     hasCatalyst: [false],
 
-    // Step 3 - Appearance
     color: ['', Validators.required],
     interiorColor: ['', Validators.required],
     interiorMaterial: ['', Validators.required],
 
-    // Step 4 - Listing info
     city: ['', Validators.required],
     carPrice: [null as number | null, [Validators.required, Validators.min(1)]],
     isExchangePossible: [false],
@@ -92,9 +92,10 @@ export class AddCar {
     4: ['city', 'carPrice', 'userPhone'],
   };
 
-  totalFieldCount = Object.values(this.stepFieldNames).reduce((sum, arr) => sum + arr.length, 0);
+  private formValue = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
 
   filledCount = computed(() => {
+    this.formValue();
     const names = this.stepFieldNames[this.step()] ?? [];
     const v = this.form.getRawValue() as Record<string, unknown>;
     return names.filter(n => {
@@ -103,14 +104,20 @@ export class AddCar {
     }).length;
   });
 
-  overallFilledCount = computed(() => {
-    const v = this.form.getRawValue() as Record<string, unknown>;
-    const allNames = Object.values(this.stepFieldNames).flat();
-    return allNames.filter(n => {
-      const val = v[n];
-      return val !== '' && val !== null && val !== undefined;
-    }).length;
+  previewCar = computed(() => {
+    this.formValue();
+    const v = this.form.getRawValue();
+    return {
+      carModel: v.manufacturer && v.carModel ? `${v.manufacturer} ${v.carModel}` : (v.carModel || v.manufacturer || null),
+      city: v.city || null,
+      carPrice: v.carPrice,
+      fuelType: v.fuelType || null,
+      carAge: v.carAge || null,
+      carType: v.carType || null,
+    };
   });
+
+  previewImage = computed(() => this.imagePreviews()[0] ?? null);
 
   isStepValid(n: number): boolean {
     const names = this.stepFieldNames[n] ?? [];
@@ -153,7 +160,22 @@ export class AddCar {
     if (!input.files || input.files.length === 0) return;
 
     const incoming = Array.from(input.files);
-    const combined = [...this.selectedImages(), ...incoming].slice(0, 6);
+    const room = this.maxImages - this.selectedImages().length;
+
+    if (room <= 0) {
+      this.error.set(`მაქსიმუმ ${this.maxImages} ფოტოს ატვირთვაა შესაძლებელი.`);
+      input.value = '';
+      return;
+    }
+
+    const accepted = incoming.slice(0, room);
+    if (incoming.length > accepted.length) {
+      this.error.set(`მაქსიმუმ ${this.maxImages} ფოტოს ატვირთვაა შესაძლებელი — დაემატა მხოლოდ პირველი ${accepted.length}.`);
+    } else {
+      this.error.set(null);
+    }
+
+    const combined = [...this.selectedImages(), ...accepted];
     this.selectedImages.set(combined);
 
     const previews: string[] = [];
@@ -170,7 +192,6 @@ export class AddCar {
       reader.readAsDataURL(file);
     });
 
-    // allow re-selecting the same file(s) later
     input.value = '';
   }
 
@@ -180,12 +201,10 @@ export class AddCar {
   }
 
   submit(): void {
-    // touch every control so validation messages / styles show up
     this.form.markAllAsTouched();
 
     if (this.form.invalid) {
       this.error.set('გთხოვთ შეავსოთ ყველა სავალდებულო ველი.');
-      // jump user back to the first step that's actually incomplete
       for (let s = 1; s <= this.totalSteps; s++) {
         if (!this.isStepValid(s)) {
           this.step.set(s);
@@ -195,8 +214,8 @@ export class AddCar {
       return;
     }
 
-    if (this.selectedImages().length !== 6) {
-      this.error.set('საჭიროა ზუსტად 6 ფოტოს ატვირთვა.');
+    if (this.selectedImages().length < this.minImages || this.selectedImages().length > this.maxImages) {
+      this.error.set(`საჭიროა ${this.minImages}-დან ${this.maxImages}-მდე ფოტოს ატვირთვა.`);
       this.step.set(3);
       return;
     }
@@ -245,8 +264,54 @@ export class AddCar {
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set(err?.error?.message || err?.error || 'დაფიქსირდა შეცდომა მანქანის დამატებისას.');
-        console.error(err);
+        this.error.set(this.extractErrorMessage(err));
+      }
+    });
+  }
+
+  private extractErrorMessage(err: any): string {
+    const body = err?.error;
+    if (typeof body === 'string' && body.trim()) return body;
+    if (body?.message) return body.message;
+    if (body?.title) return body.title;
+    if (body?.errors) {
+      const first = Object.values(body.errors as Record<string, string[]>)[0];
+      if (Array.isArray(first) && first.length) return first[0];
+    }
+    if (err?.status === 401) return 'გთხოვთ გაიაროთ ავტორიზაცია განცხადების დასამატებლად.';
+    if (err?.status === 0) return 'სერვერთან კავშირი ვერ დამყარდა.';
+    return 'დაფიქსირდა შეცდომა მანქანის დამატებისას.';
+  }
+
+  savedListingsOpen = signal(false);
+  savedListings = signal<CarModels[]>([]);
+  savedListingsLoading = signal(false);
+  savedListingsError = signal<string | null>(null);
+  savedListingsLoaded = false;
+
+  toggleSavedListings(): void {
+    this.savedListingsOpen.update(o => !o);
+    if (this.savedListingsOpen() && !this.savedListingsLoaded) {
+      this.loadSavedListings();
+    }
+  }
+
+  goToSavedListing(id: number): void {
+    this.router.navigate(['/car', id]);
+  }
+
+  loadSavedListings(): void {
+    this.savedListingsLoading.set(true);
+    this.savedListingsError.set(null);
+    this.api.getMyCars().subscribe({
+      next: (cars) => {
+        this.savedListingsLoading.set(false);
+        this.savedListingsLoaded = true;
+        this.savedListings.set(cars ?? []);
+      },
+      error: () => {
+        this.savedListingsLoading.set(false);
+        this.savedListingsError.set('შენახული განცხადებების ჩატვირთვა ვერ მოხერხდა.');
       }
     });
   }
