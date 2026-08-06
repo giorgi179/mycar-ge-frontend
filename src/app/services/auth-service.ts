@@ -47,6 +47,26 @@ export class AuthService {
         return localStorage.getItem('accessToken');
     }
 
+    getUserId(): number | null {
+        const token = this.getAccessToken();
+        if (!token) {
+            return null;
+        }
+
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            return null;
+        }
+
+        try {
+            const payload = JSON.parse(atob(parts[1]));
+            const id = payload?.nameid ?? payload?.sub ?? payload?.userId;
+            return id != null ? Number(id) : null;
+        } catch {
+            return null;
+        }
+    }
+
     getRefreshToken(): string | null {
         if (!this.isBrowser) return null;
         return localStorage.getItem('refreshToken');

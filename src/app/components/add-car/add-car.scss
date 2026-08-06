@@ -1,0 +1,1190 @@
+// =========================================================
+// Add Car — multi-step listing form
+// Style: myauto.ge sell-flow — dark sidebar rail with step
+// progress, white content card, dropdown-style fields with
+// 2-col grid, mint "Add by VIN" callout, orange CTA accents
+// =========================================================
+
+@use 'sass:color';
+
+// ---- palette, lifted directly off the reference ----
+$c-sidebar:        #241c3d;   // "Saved listings" header + rail bg
+$c-sidebar-line:    rgba(255, 255, 255, 0.14);
+$c-sidebar-text:    #b9b3cf;
+$c-sidebar-text-active: #ffffff;
+
+$c-canvas:          #eef0f4;
+$c-surface:         #ffffff;
+$c-border:          #e4e7ee;
+$c-border-strong:   #d3d7e0;
+
+$c-text:            #1c2333;
+$c-text-dim:        #6b7280;
+$c-text-faint:      #a3a9b7;
+
+$c-accent-orange:   #f0672c;   // "Cars" tab, radio, VIN "Add" btn
+$c-accent-orange-soft: #fdece4;
+$c-accent-blue:     #2196f3;   // loan CTA
+$c-accent-blue-dark: #1a7fd1;
+
+$c-mint:            #cdeede;   // VIN banner bg
+$c-mint-line:       rgba(18, 135, 90, 0.18);
+$c-mint-text:       #0f7a4f;
+
+$c-required:        #e0483e;
+
+$c-success:         #22b573;
+$c-success-soft:    #e6f8ef;
+
+$c-error:           #d92d20;
+$c-error-soft:      #fdeeed;
+
+$radius-sm:   8px;
+$radius-md:   12px;
+$radius-lg:   14px;
+
+$font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+$shadow-card:  0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+$shadow-raised: 0 4px 14px rgba(33, 150, 243, 0.28);
+$transition:   150ms ease;
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid $c-accent-blue;
+    outline-offset: 2px;
+  }
+}
+
+// =========================================================
+// Root — two-column shell: dark step rail + content
+// =========================================================
+
+.add-car {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 24px 72px;
+  color: $c-text;
+  font-family: $font-body;
+  background: $c-canvas;
+  align-items: start;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+    padding: 20px 14px 56px;
+    gap: 16px;
+  }
+
+  @media (max-width: 320px) {
+    padding: 14px 8px 48px;
+  }
+
+  // ---------------------------------------------------
+  // Left rail — "Saved listings" + numbered step trail
+  // ---------------------------------------------------
+  &__rail {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: sticky;
+    top: 24px;
+
+    @media (max-width: 860px) {
+      position: static;
+    }
+  }
+
+  &__rail-header {
+    background: $c-sidebar;
+    color: $c-sidebar-text-active;
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-align: center;
+    padding: 15px 16px;
+    border-radius: $radius-md;
+
+    @media (max-width: 320px) {
+      padding: 12px;
+      font-size: 0.85rem;
+    }
+  }
+
+  &__rail-steps {
+    background: $c-surface;
+    border: 1px solid $c-border;
+    border-radius: $radius-md;
+    padding: 20px 18px;
+    box-shadow: $shadow-card;
+  }
+
+  &__rail-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    padding-bottom: 26px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    font-family: $font-body;
+    @include focus-ring;
+
+    &:last-child {
+      padding-bottom: 0;
+
+      .add-car__rail-connector {
+        display: none;
+      }
+    }
+  }
+
+  &__rail-marker {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid $c-border-strong;
+    background: $c-surface;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color $transition, background $transition;
+    margin-top: 1px;
+    position: relative;
+
+    svg {
+      width: 11px;
+      height: 11px;
+      opacity: 0;
+      transition: opacity $transition;
+      position: relative;
+      z-index: 1;
+      color: #fff;
+    }
+  }
+
+  &__rail-connector {
+    position: absolute;
+    left: 9px;
+    top: 22px;
+    bottom: 2px;
+    width: 1px;
+    background: $c-border-strong;
+  }
+
+  &__rail-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $c-text-faint;
+    line-height: 1.35;
+    padding-top: 1px;
+    transition: color $transition;
+  }
+
+  &__rail-step {
+    &--current {
+      .add-car__rail-marker {
+        border-color: $c-accent-blue;
+
+        &::after {
+          content: '';
+          position: absolute;
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background: $c-accent-blue;
+        }
+      }
+
+      .add-car__rail-label {
+        color: $c-text;
+        font-weight: 700;
+      }
+    }
+
+    &--done {
+      .add-car__rail-marker {
+        border-color: $c-success;
+        background: $c-success;
+
+        svg {
+          opacity: 1;
+        }
+      }
+
+      .add-car__rail-connector {
+        background: $c-success;
+      }
+
+      .add-car__rail-label {
+        color: $c-text-dim;
+      }
+    }
+  }
+
+  // ---------------------------------------------------
+  // Rail preview card — quiet placeholder like reference
+  // ---------------------------------------------------
+  &__rail-preview {
+    background: $c-surface;
+    border: 1px solid $c-border;
+    border-radius: $radius-md;
+    padding: 14px;
+    box-shadow: $shadow-card;
+  }
+
+  &__rail-preview-art {
+    height: 150px;
+    border-radius: $radius-sm;
+    background: $c-canvas;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $c-text-faint;
+    margin-bottom: 12px;
+
+    svg {
+      width: 42px;
+      height: 42px;
+    }
+  }
+
+  &__rail-preview-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    span {
+      display: block;
+      height: 7px;
+      border-radius: 4px;
+      background: $c-border;
+
+      &:nth-child(1) { width: 70%; }
+      &:nth-child(2) { width: 42%; }
+    }
+  }
+
+  &__rail-preview-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    div {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
+      color: $c-text-faint;
+      flex-shrink: 0;
+    }
+
+    span {
+      display: block;
+      height: 6px;
+      border-radius: 4px;
+      background: $c-border;
+      flex: 1;
+    }
+  }
+
+  // ---------------------------------------------------
+  // Main column
+  // ---------------------------------------------------
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  // ---- vehicle-type tabs ----
+  &__tabs {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    background: $c-surface;
+    border: 1px solid $c-border;
+    border-radius: $radius-md;
+    padding: 18px 22px 0;
+    box-shadow: $shadow-card;
+    overflow-x: auto;
+
+    @media (max-width: 480px) {
+      gap: 20px;
+      padding: 14px 16px 0;
+    }
+  }
+
+  &__tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: transparent;
+    color: $c-text-dim;
+    font-family: $font-body;
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 0 2px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color $transition, border-color $transition;
+    @include focus-ring;
+
+    svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    &:hover {
+      color: $c-text;
+    }
+
+    &--active {
+      color: $c-accent-orange;
+      border-bottom-color: $c-accent-orange;
+    }
+  }
+
+  // ---- sale/rent + loan CTA row ----
+  &__saletype-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: $c-surface;
+    border: 1px solid $c-border;
+    border-radius: $radius-md;
+    padding: 18px 22px;
+    box-shadow: $shadow-card;
+    flex-wrap: wrap;
+
+    @media (max-width: 480px) {
+      padding: 14px 16px;
+    }
+  }
+
+  &__radio-group {
+    display: flex;
+    gap: 26px;
+  }
+
+  &__radio {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    font-size: 0.92rem;
+    color: $c-text-dim;
+    font-weight: 500;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: $font-body;
+    @include focus-ring;
+
+    &-dot {
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      border: 2px solid $c-border-strong;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color $transition;
+
+      &::after {
+        content: '';
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: $c-accent-orange;
+        opacity: 0;
+        transition: opacity $transition;
+      }
+    }
+
+    &--active {
+      color: $c-text;
+
+      .add-car__radio-dot {
+        border-color: $c-accent-orange;
+
+        &::after {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  &__loan-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: $c-accent-blue;
+    color: #fff;
+    font-family: $font-body;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 13px 20px;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    box-shadow: $shadow-raised;
+    transition: background $transition;
+    @include focus-ring;
+
+    svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    &:hover {
+      background: $c-accent-blue-dark;
+    }
+  }
+
+  // ---- Add by VIN banner ----
+  &__vin {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: $c-mint;
+    border: 1px solid $c-mint-line;
+    border-radius: $radius-lg;
+    padding: 24px 26px;
+    flex-wrap: wrap;
+
+    @media (max-width: 620px) {
+      padding: 18px;
+    }
+  }
+
+  &__vin-copy {
+    max-width: 400px;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 6px;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: $c-text;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: color.adjust($c-mint-text, $lightness: -8%);
+      line-height: 1.5;
+    }
+  }
+
+  &__vin-badge {
+    background: $c-mint-text;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+
+  &__vin-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+
+    @media (max-width: 620px) {
+      width: 100%;
+      align-items: stretch;
+    }
+  }
+
+  &__vin-input-row {
+    display: flex;
+    gap: 10px;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+    }
+  }
+
+  &__vin-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    svg {
+      position: absolute;
+      right: 13px;
+      width: 17px;
+      height: 17px;
+      color: $c-text-faint;
+      pointer-events: none;
+    }
+
+    input {
+      width: 240px;
+      background: $c-surface;
+      border: 1px solid $c-border-strong;
+      border-radius: $radius-sm;
+      padding: 12px 38px 12px 14px;
+      font-family: $font-body;
+      font-size: 0.88rem;
+      color: $c-text;
+      box-sizing: border-box;
+      height: 46px;
+      @include focus-ring;
+
+      @media (max-width: 480px) {
+        width: 100%;
+      }
+
+      &::placeholder {
+        color: $c-text-faint;
+      }
+    }
+  }
+
+  &__vin-add-btn {
+    border: none;
+    background: $c-accent-orange-soft;
+    color: $c-accent-orange;
+    font-family: $font-body;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 0 24px;
+    height: 46px;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    transition: background $transition, color $transition;
+    @include focus-ring;
+
+    &:hover {
+      background: $c-accent-orange;
+      color: #fff;
+    }
+  }
+
+  &__vin-find {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: $c-text;
+    font-family: $font-body;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 2px 0;
+    @include focus-ring;
+
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // ---------------------------------------------------
+  // Error banner
+  // ---------------------------------------------------
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: $c-error-soft;
+    border: 1px solid rgba($c-error, 0.25);
+    color: $c-error;
+    border-radius: $radius-sm;
+    padding: 13px 16px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin: 0;
+
+    @media (max-width: 320px) {
+      padding: 10px 12px;
+      font-size: 0.8rem;
+    }
+  }
+
+  // ---------------------------------------------------
+  // Form shell / section card
+  // ---------------------------------------------------
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__section {
+    background: $c-surface;
+    border: 1px solid $c-border;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-card;
+    animation: fadeSlideIn 220ms ease;
+    overflow: hidden;
+  }
+
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  &__section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 24px;
+    border-bottom: 1px solid $c-border;
+
+    @media (max-width: 480px) {
+      padding: 16px 18px;
+    }
+  }
+
+  &__section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: $c-text;
+
+    svg {
+      width: 19px;
+      height: 19px;
+      color: $c-text-dim;
+      flex-shrink: 0;
+    }
+  }
+
+  &__section-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: $c-text-faint;
+    font-weight: 500;
+    flex-shrink: 0;
+
+    svg:last-child {
+      width: 16px;
+      height: 16px;
+      color: $c-text-dim;
+      cursor: pointer;
+    }
+  }
+
+  &__progress-ring {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid $c-success-soft;
+    border-top-color: $c-success;
+    flex-shrink: 0;
+  }
+
+  &__section-body {
+    padding: 22px 24px 24px;
+
+    @media (max-width: 480px) {
+      padding: 16px 18px 18px;
+    }
+
+    @media (max-width: 320px) {
+      padding: 12px 14px 14px;
+    }
+  }
+
+  // ---------------------------------------------------
+  // Field layout — 2-column dropdown-styled grid
+  // ---------------------------------------------------
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 560px) {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+  }
+
+  &__row--three {
+    grid-template-columns: 1fr 0.7fr 1fr;
+
+    @media (max-width: 560px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__row--split {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+
+    @media (max-width: 560px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__required {
+    color: $c-required;
+    margin-left: 2px;
+  }
+
+  // Labels now live above each control (see &__field-label) rather
+  // than floating inside it — simpler, no overlap/z-index tricks,
+  // and works identically for text inputs and <select>.
+  &__control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 48px;
+
+    input,
+    select {
+      width: 100%;
+      height: 100%;
+    }
+
+    &--has-chevron {
+      svg.add-car__chevron {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 15px;
+        height: 15px;
+        color: $c-text-dim;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      input,
+      select {
+        padding-right: 38px;
+      }
+    }
+  }
+
+  // ---------------------------------------------------
+  // Inputs — pill-cornered boxes that read as dropdowns
+  // ---------------------------------------------------
+  input[type='text'],
+  input[type='number'],
+  textarea,
+  select {
+    width: 100%;
+    background: $c-surface;
+    border: 1px solid $c-border-strong;
+    border-radius: $radius-sm;
+    color: $c-text;
+    font-family: $font-body;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 14px 15px;
+    transition: border-color $transition, box-shadow $transition;
+    box-sizing: border-box;
+    appearance: none;
+    @include focus-ring;
+
+    @media (max-width: 320px) {
+      padding: 11px 12px;
+      font-size: 0.82rem;
+    }
+
+    &::placeholder {
+      color: $c-text-faint;
+      font-weight: 400;
+    }
+
+    &:hover {
+      border-color: color.adjust($c-border-strong, $lightness: -10%);
+    }
+
+    &:focus {
+      border-color: $c-accent-blue;
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.12);
+      outline: none;
+    }
+  }
+
+  // the box border/bg lives on __control; the input itself stays
+  // borderless/transparent-bg so it sits flush inside that box
+  &__control {
+    background: $c-surface;
+    border: 1px solid $c-border-strong;
+    border-radius: $radius-sm;
+    transition: border-color $transition, box-shadow $transition;
+
+    &:hover {
+      border-color: color.adjust($c-border-strong, $lightness: -10%);
+    }
+
+    &:focus-within {
+      border-color: $c-accent-blue;
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.12);
+    }
+
+    &--invalid {
+      border-color: $c-error;
+
+      &:focus-within {
+        border-color: $c-error;
+        box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12);
+      }
+    }
+
+    input,
+    select {
+      border: none;
+      background: transparent;
+      box-shadow: none !important;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 110px;
+    line-height: 1.55;
+    padding-top: 13px;
+  }
+
+  input[type='file'] {
+    width: 100%;
+    color: $c-text-dim;
+    font-size: 0.82rem;
+    background: $c-canvas;
+    border: 1px dashed $c-border-strong;
+    border-radius: $radius-sm;
+    padding: 15px 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: border-color $transition, background $transition;
+
+    @media (max-width: 320px) {
+      padding: 11px 9px;
+      font-size: 0.74rem;
+    }
+
+    &:hover {
+      border-color: $c-accent-blue;
+      background: rgba(33, 150, 243, 0.05);
+    }
+
+    &::file-selector-button {
+      background: $c-accent-blue;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      margin-right: 12px;
+      font-weight: 600;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: background $transition;
+
+      &:hover {
+        background: $c-accent-blue-dark;
+      }
+    }
+  }
+
+  // ---------------------------------------------------
+  // Pill / chip selectors (technical + appearance steps)
+  // ---------------------------------------------------
+  &__field-label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $c-text-dim;
+    margin-bottom: 9px;
+
+    @media (max-width: 320px) {
+      font-size: 0.74rem;
+      margin-bottom: 7px;
+    }
+  }
+
+  &__pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    @media (max-width: 320px) {
+      gap: 6px;
+    }
+  }
+
+  &__pill {
+    padding: 9px 15px;
+    border-radius: $radius-sm;
+    border: 1px solid $c-border-strong;
+    background: $c-surface;
+    color: $c-text-dim;
+    font-size: 0.84rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background $transition, border-color $transition, color $transition;
+    @include focus-ring;
+
+    @media (max-width: 320px) {
+      padding: 7px 11px;
+      font-size: 0.74rem;
+    }
+
+    &:hover {
+      border-color: $c-accent-blue;
+      color: $c-accent-blue;
+    }
+
+    &--active {
+      background: $c-accent-blue;
+      border-color: $c-accent-blue;
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+
+  // ---------------------------------------------------
+  // Turbo-style inline toggle chip (matches ref switch pill)
+  // ---------------------------------------------------
+  &__toggle-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 48px;
+    border: 1px solid $c-border-strong;
+    border-radius: $radius-sm;
+    background: $c-surface;
+    padding: 0 16px;
+    cursor: pointer;
+    font-family: $font-body;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: $c-text;
+    transition: border-color $transition;
+    white-space: nowrap;
+    @include focus-ring;
+
+    &:hover {
+      border-color: $c-text-faint;
+    }
+  }
+
+  &__switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: $c-border-strong;
+    transition: background $transition;
+    cursor: pointer;
+
+    span {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+      transition: transform $transition;
+    }
+
+    &--on {
+      background: $c-accent-blue;
+
+      span {
+        transform: translateX(16px);
+      }
+    }
+  }
+
+  &__field--toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    label {
+      font-size: 0.9rem;
+      color: $c-text;
+      font-weight: 500;
+    }
+  }
+
+  // ---------------------------------------------------
+  // Photo previews
+  // ---------------------------------------------------
+  &__photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 320px) {
+      gap: 6px;
+    }
+  }
+
+  &__photo-thumb {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: $radius-sm;
+    overflow: hidden;
+    border: 1px solid $c-border;
+    background: $c-canvas;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(28, 35, 51, 0.75);
+      color: #fff;
+      font-size: 0.95rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background $transition;
+
+      &:hover {
+        background: $c-error;
+      }
+    }
+  }
+
+  // ---------------------------------------------------
+  // Navigation buttons
+  // ---------------------------------------------------
+  &__nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    @media (max-width: 320px) {
+      margin-top: 4px;
+    }
+  }
+
+  &__btn {
+    flex: 1;
+    padding: 13px 20px;
+    border-radius: $radius-sm;
+    border: 1px solid transparent;
+    font-family: $font-body;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background $transition, border-color $transition, color $transition, opacity $transition;
+    @include focus-ring;
+
+    @media (max-width: 320px) {
+      padding: 10px 14px;
+      font-size: 0.8rem;
+    }
+
+    &--ghost {
+      background: $c-surface;
+      border-color: $c-border-strong;
+      color: $c-text-dim;
+
+      &:hover {
+        border-color: $c-text-dim;
+        color: $c-text;
+      }
+    }
+
+    &--primary {
+      background: $c-accent-blue;
+      color: #fff;
+      box-shadow: $shadow-raised;
+
+      &:hover {
+        background: $c-accent-blue-dark;
+      }
+    }
+
+    &--submit {
+      background: $c-accent-orange;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(240, 103, 44, 0.28);
+
+      &:hover {
+        background: color.adjust($c-accent-orange, $lightness: -6%);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

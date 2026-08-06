@@ -1,8 +1,8 @@
 export interface CarImage {
 
-  id:number;
+  id: number;
 
-  imageUrl:string;
+  imageUrl: string;
 
 }
 
@@ -79,7 +79,37 @@ export interface CarModels {
   } | null;
 
 }
+export interface CarAddRequest {
+  city: string;
+  carAge: string;
+  carModel: string;
+  carPrice: number;
+  carType: string;
+  fuelType: string;
 
+  manufacturer: string;
+  mileage: string;
+  engineVolume: string;
+  cylinders: number;
+  transmission: string;
+  driveType: string;
+  doors: string;
+  airbags: number;
+  steeringWheel: string;
+  color: string;
+  interiorColor: string;
+  interiorMaterial: string;
+
+  isExchangePossible: boolean;
+  hasTechInspection: boolean;
+  hasCatalyst: boolean;
+
+  description: string;
+  userPhone: string;
+  vinCode: string;
+
+  images: File[];
+}
 export interface UserRegister {
   firstName: string;
   lastName: string;
