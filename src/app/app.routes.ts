@@ -8,6 +8,7 @@ import { ErorPage } from './components/eror-page/eror-page';
 import { Cars } from './components/cars/cars';
 import { Cardetals } from './components/cardetals/cardetals';
 import { guestGuard } from './guards/guest-guard-guard';
+import { Profile } from './components/profile/profile';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -16,5 +17,6 @@ export const routes: Routes = [
     { path: 'auth', component: Auth, canActivate: [guestGuard] },
     { path: 'add-car', component: AddCar, canActivate: [authGuard] },
     { path: 'register', component: Register, canActivate: [guestGuard] },
+    { path: 'profile', component: Profile, canActivate: [authGuard] },
     { path: '**', component: ErorPage }
 ];

@@ -6,7 +6,7 @@
         "contact": "Contact",
         "login": "Login",
         "register": "Register",
-        "logout": "Logout"
+        "profile": "Profile"
     },
     "home": {
         "title": "Car Catalog",
@@ -235,5 +235,37 @@
             "savedListingsFailed": "Failed to load saved listings",
             "generic": "An error occurred while adding the car"
         }
+    },
+    "profile": {
+        "logout": "Logout",
+        "verified": "Verified",
+        "unverified": "Unverified",
+        "statListings": "Active listings",
+        "statValue": "Total value",
+        "statNewest": "Latest added",
+        "closeAlert": "Close",
+        "tabOverview": "Overview",
+        "tabCars": "My listings",
+        "tabAdd": "Add a car",
+        "tabSettings": "Settings",
+        "recentActivity": "Recent activity",
+        "noCarsYet": "You haven't added any cars yet.",
+        "addFirstListing": "Add your first listing",
+        "myListings": "My listings",
+        "newListing": "+ New listing",
+        "noListingsFound": "No listings found.",
+        "editBtn": "Edit",
+        "deleteBtn": "Delete",
+        "editProfile": "Edit profile",
+        "changePhoto": "Change photo",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email",
+        "saving": "Saving...",
+        "saveChanges": "Save changes",
+        "deleteTitle": "Delete listing",
+        "deleteConfirm": "Are you sure you want to delete {{model}}? This action is irreversible.",
+        "cancel": "Cancel",
+        "confirmDelete": "Yes, delete"
     }
 }

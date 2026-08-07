@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, computed, inject, signal } from '@angular/core';
+import { Component, ViewEncapsulation, computed, inject, signal, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -56,10 +56,17 @@ function vinValidator(control: AbstractControl): ValidationErrors | null {
   styleUrl: './add-car.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class AddCar {
+export class AddCar implements OnInit {
   private fb = inject(FormBuilder);
   private api = inject(AddCarServices);
   private router = inject(Router);
+
+  // NOTE: field names in patchValue below (manufacturer, carAge, carDetals?.vinCode,
+  // etc.) are inferred from usage in profile.html and profile.ts, since I have not
+  // seen the CarModels interface directly. Verify each key against the real type
+  // before trusting this in production.
+  @Input() editingCar: CarModels | null = null;
+  @Output() editComplete = new EventEmitter<void>();
 
   imageBaseUrl = (environment as { imageUrl?: string }).imageUrl ?? '';
 
@@ -75,9 +82,6 @@ export class AddCar {
 
   saleType = signal<'sale' | 'rent'>('sale');
 
-  // error() ინახავს არა ტექსტს, არამედ თარგმანის key-ს (+ საჭიროების
-  // შემთხვევაში interpolation პარამეტრებს). Template თავად თარგმნის
-  // TranslatePipe-ის საშუალებით: {{ error() | translate:errorParams() }}
   private errorKey = signal<string | null>(null);
   private errorParamsSig = signal<Record<string, string | number> | undefined>(undefined);
   error = computed(() => this.errorKey());
@@ -90,6 +94,11 @@ export class AddCar {
 
   selectedImages = signal<File[]>([]);
   imagePreviews = signal<string[]>([]);
+
+  // Existing images already on the server when editing. These are URLs,
+  // not Files, and are kept separate from selectedImages/imagePreviews
+  // because the upload/removal logic differs (no FileReader needed).
+  existingImageUrls = signal<string[]>([]);
 
   manufacturerList = ['Toyota', 'BMW', 'Mercedes-Benz', 'Ford', 'Hyundai', 'Kia', 'Honda', 'Nissan', 'Volkswagen', 'Lexus'];
   fuelTypeList = ['ბენზინი', 'დიზელი', 'ჰიბრიდი', 'ელექტრო', 'გაზი'];
@@ -161,14 +170,59 @@ export class AddCar {
     };
   });
 
-  previewImage = computed(() => this.imagePreviews()[0] ?? null);
+  // Falls back to an existing (already-uploaded) image if no new image
+  // has been selected yet — otherwise the preview goes blank in edit mode.
+  previewImage = computed(() => this.imagePreviews()[0] ?? this.existingImageUrls()[0] ?? null);
+
+  ngOnInit(): void {
+    if (this.editingCar) {
+      this.patchFormFromCar(this.editingCar);
+    }
+  }
+
+  private patchFormFromCar(car: CarModels): void {
+    const c = car as unknown as Record<string, any>;
+    this.form.patchValue({
+      manufacturer: c['manufacturer'] ?? '',
+      carModel: c['carModel'] ?? '',
+      carAge: c['carAge'] ?? '',
+      carType: c['carType'] ?? '',
+      fuelType: c['fuelType'] ?? '',
+      mileage: c['mileage'] ?? '',
+      engineVolume: c['engineVolume'] ?? '',
+      cylinders: c['cylinders'] ?? null,
+      transmission: c['transmission'] ?? '',
+      driveType: c['driveType'] ?? '',
+      doors: c['doors'] ?? '',
+      airbags: c['airbags'] ?? null,
+      steeringWheel: c['steeringWheel'] ?? '',
+      hasTechInspection: c['hasTechInspection'] ?? false,
+      hasCatalyst: c['hasCatalyst'] ?? false,
+      color: c['color'] ?? '',
+      interiorColor: c['interiorColor'] ?? '',
+      interiorMaterial: c['interiorMaterial'] ?? '',
+      city: c['city'] ?? '',
+      carPrice: c['carPrice'] ?? null,
+      isExchangePossible: c['isExchangePossible'] ?? false,
+      description: c['description'] ?? '',
+      userPhone: c['userPhone'] ?? '',
+      vinCode: c['carDetals']?.['vinCode'] ?? c['vinCode'] ?? '',
+    });
+
+    // NOTE: field holding existing image URL(s) is unconfirmed — profile.html
+    // uses car.carImg (singular) as one string, but add-car supports multiple
+    // images. If the backend only returns one existing image, this array has
+    // one entry; if there's a real array field (e.g. car.images), use that
+    // instead of wrapping carImg.
+    const img = c['carImg'];
+    this.existingImageUrls.set(img ? [img] : []);
+  }
 
   isStepValid(n: number): boolean {
     const names = this.stepFieldNames[n] ?? [];
     return names.every(name => this.form.get(name)?.valid ?? true);
   }
 
-  /** კონკრეტული ველის შეცდომის key. Template: {{ fieldErrorKey('carAge') | translate }} */
   fieldErrorKey(name: string): string | null {
     const control = this.form.get(name);
     if (!control || !control.touched || control.valid) return null;
@@ -227,17 +281,14 @@ export class AddCar {
     if (!input.files || input.files.length === 0) return;
 
     const incoming = Array.from(input.files);
-    const currentCount = this.selectedImages().length;
+    const currentCount = this.selectedImages().length + this.existingImageUrls().length;
 
-    // უკვე ლიმიტზეა — საერთოდ არაფერი არ დაემატება
     if (currentCount >= this.maxImages) {
       this.setError('addCar.errors.maxImages', { max: this.maxImages });
       input.value = '';
       return;
     }
 
-    // მთლიანი მოთხოვნილი რაოდენობა (already selected + newly picked) ლიმიტს სცდება —
-    // მთლიანად უარვყოფთ არჩევანს, ნაწილობრივ აღარ ვჭრით ჩუმად.
     if (currentCount + incoming.length > this.maxImages) {
       this.setError('addCar.errors.maxImages', { max: this.maxImages });
       input.value = '';
@@ -302,6 +353,10 @@ export class AddCar {
     this.imagePreviews.update(previews => previews.filter((_, i) => i !== index));
   }
 
+  removeExistingImage(index: number): void {
+    this.existingImageUrls.update(urls => urls.filter((_, i) => i !== index));
+  }
+
   submit(): void {
     this.form.markAllAsTouched();
 
@@ -316,7 +371,8 @@ export class AddCar {
       return;
     }
 
-    if (this.selectedImages().length < this.minImages || this.selectedImages().length > this.maxImages) {
+    const totalImageCount = this.selectedImages().length + this.existingImageUrls().length;
+    if (totalImageCount < this.minImages || totalImageCount > this.maxImages) {
       this.setError('addCar.errors.imageCountRange', { min: this.minImages, max: this.maxImages });
       this.step.set(3);
       return;
@@ -359,20 +415,33 @@ export class AddCar {
       images: this.selectedImages(),
     };
 
-    this.api.addCar(request).subscribe({
-      next: (res) => {
-        this.loading.set(false);
-        this.router.navigate(['/car', res.carId]);
-      },
-      error: (err) => {
-        this.loading.set(false);
-        const { key, params } = this.extractServerErrorKey(err);
-        this.setError(key, params);
-      }
-    });
+    if (this.editingCar) {
+      this.api.editCar(this.editingCar.id, request).subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.editComplete.emit();
+        },
+        error: (err) => {
+          this.loading.set(false);
+          const { key, params } = this.extractServerErrorKey(err);
+          this.setError(key, params);
+        }
+      });
+    } else {
+      this.api.addCar(request).subscribe({
+        next: (res) => {
+          this.loading.set(false);
+          this.router.navigate(['/car', res.carId]);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          const { key, params } = this.extractServerErrorKey(err);
+          this.setError(key, params);
+        }
+      });
+    }
   }
 
-  /** სერვერის შეცდომას გადააქცევს თარგმანის key-დ. */
   private extractServerErrorKey(err: unknown): { key: string; params?: Record<string, string | number> } {
     const httpErr = err as { status?: number; error?: unknown };
 

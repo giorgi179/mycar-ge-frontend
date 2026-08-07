@@ -58,13 +58,13 @@
 
         <app-language-selector></app-language-selector>
         @if (auth.isLoggedIn()) {
-        <a href="" class="header__login" (click)="closeMenu()">
+        <a routerLink="/profile" class="header__login" (click)="closeMenu()">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="8" cy="5" r="2.5" stroke="#1A1A1A" stroke-width="1.2" />
                 <path d="M3 13.5C3.5 10.8 5.5 9.5 8 9.5C10.5 9.5 12.5 10.8 13 13.5" stroke="#1A1A1A" stroke-width="1.2"
                     stroke-linecap="round" />
             </svg>
-            <span>{{ 'nav.logout' | translate }}</span>
+            <span>{{ 'nav.profile' | translate }}</span>
         </a>
         }@else {
         <a routerLink="/auth" class="header__login" (click)="closeMenu()">

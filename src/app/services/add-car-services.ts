@@ -10,23 +10,17 @@ import { CarAddRequest, CarModels } from './components';
 })
 export class AddCarServices {
   private http = inject(HttpClient);
-  // environment.apiUrl already ends in "/api" (see environment.ts),
-  // so every path below must NOT repeat "/api" again — the previous
-  // version built ".../api/api/Car/add-car" and 404'd on every call.
   private api = environment.apiUrl;
 
   getManufacturers(): Observable<{ name: string }[]> {
     return this.http.get<{ name: string }[]>(`${this.api}/Car/get-manufacturers`);
   }
 
-  // Backend reads the user id off the auth token's claims, so no id
-  // needs to (or can) be passed in — the endpoint always returns only
-  // the logged-in user's own listings.
   getMyCars(): Observable<CarModels[]> {
     return this.http.get<CarModels[]>(`${this.api}/Car/get-my-cars`);
   }
 
-  addCar(request: CarAddRequest): Observable<{ message: string; carId: number }> {
+  private buildFormData(request: CarAddRequest): FormData {
     const formData = new FormData();
 
     formData.append('City', request.city);
@@ -61,6 +55,19 @@ export class AddCarServices {
       formData.append('Images', file, file.name);
     });
 
+    return formData;
+  }
+
+  addCar(request: CarAddRequest): Observable<{ message: string; carId: number }> {
+    const formData = this.buildFormData(request);
     return this.http.post<{ message: string; carId: number }>(`${this.api}/Car/add-car`, formData);
+  }
+
+  // NOTE: endpoint path/method (PUT vs PATCH, "edit-car" vs "update-car")
+  // is a guess — I have not seen the backend controller. Confirm against
+  // your actual API before relying on this.
+  editCar(id: number, request: CarAddRequest): Observable<{ message: string }> {
+    const formData = this.buildFormData(request);
+    return this.http.put<{ message: string }>(`${this.api}/Car/edit-car/${id}`, formData);
   }
 }
