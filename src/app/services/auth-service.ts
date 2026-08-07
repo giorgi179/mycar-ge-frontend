@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { afterNextRender, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
-import { environment } from '../../environments/environment.development';
+
 import { Observable } from 'rxjs';
 import { Login, UserRegister, UserToken, Veryfi } from './components';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'

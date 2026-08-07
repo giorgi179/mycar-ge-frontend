@@ -1,5 +1,5 @@
 export const environment = {
-    production: false,
-    apiUrl: 'https://localhost:7035/api',
-    imageUrl: 'https://localhost:7035'
+    production: true,
+    apiUrl: 'https://mycar-ge-api.onrender.com/api',
+    imageUrl: 'https://mycar-ge-api.onrender.com'
 };
