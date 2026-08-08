@@ -1,0 +1,193 @@
+@if (loading()) {
+<p class="cardetals-status">{{ 'home.loading' | translate }}</p>
+} @else if (error()) {
+<p class="cardetals-status">{{ error() }}</p>
+} @else if (car(); as c) {
+
+<div class="cardetals">
+
+  <button type="button" class="cardetals__back" (click)="goBack()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    {{ 'filter.cars' | translate }}
+  </button>
+
+  <div class="cardetals__gallery">
+
+    <div class="cardetals__gallery-main">
+      <button type="button" class="cardetals__gallery-nav cardetals__gallery-nav--prev" (click)="prevImage()"
+        aria-label="Previous image">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+
+      <img [src]="activeImage()" [alt]="c.carModel" (click)="openLightbox()" style="cursor: zoom-in;" />
+
+      <button type="button" class="cardetals__gallery-nav cardetals__gallery-nav--next" (click)="nextImage()"
+        aria-label="Next image">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="cardetals__thumbs">
+      <button type="button" class="cardetals__thumb" [class.cardetals__thumb--active]="activeIndex() === 0"
+        (click)="setActiveImage(0, c.carImg)">
+        <img [src]="c.carImg" [alt]="c.carModel" />
+      </button>
+
+      @for (image of c.images; track image.id; let i = $index) {
+      <button type="button" class="cardetals__thumb" [class.cardetals__thumb--active]="activeIndex() === i + 1"
+        (click)="setActiveImage(i + 1, image.imageUrl)">
+        <img [src]="image.imageUrl" [alt]="c.carModel" />
+      </button>
+      }
+    </div>
+
+  </div>
+
+  <div class="cardetals__body">
+
+    <div class="cardetals__header">
+      <h1>{{ c.carModel }}</h1>
+      <span class="cardetals__price">{{ c.carPrice }} ₾</span>
+    </div>
+
+    <p class="cardetals__location">{{ c.city }}</p>
+
+    <div class="cardetals__grid">
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.manufacturer' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.manufacturer || '—' }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.year' | translate }}</span>
+        <span class="cardetals__value">{{ c.carAge }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.fuel' | translate }}</span>
+        <span class="cardetals__value">{{ c.fuelType }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.transmission' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.transmission || '—' }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">Mileage</span>
+        <span class="cardetals__value">{{ c.carDetals?.mileage || '—' }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">Engine Volume</span>
+        <span class="cardetals__value">{{ c.carDetals?.engineVolume || '—' }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.driveWheels' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.driveType || '—' }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.numberOfDoors' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.doors || '—' }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.airbags' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.airbags ?? '—' }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.wheel' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.steeringWheel || '—' }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.carColor' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.color || '—' }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.interiorMaterialColor' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.interiorMaterial || '—' }} / {{ c.carDetals?.interiorColor || '—'
+          }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.techInspection' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.hasTechInspection ? ('filter.yes' | translate) : ('filter.no' |
+          translate) }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.catalyst' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.hasCatalyst ? ('filter.yes' | translate) : ('filter.no' |
+          translate) }}</span>
+      </div>
+
+      <div class="cardetals__item">
+        <span class="cardetals__label">{{ 'filter.exchange' | translate }}</span>
+        <span class="cardetals__value">{{ c.carDetals?.isExchangePossible ? ('filter.yes' | translate) : ('filter.no' |
+          translate) }}</span>
+      </div>
+
+      @if (c.carDetals?.vinCode) {
+      <div class="cardetals__item">
+        <span class="cardetals__label">VIN</span>
+        <span class="cardetals__value">{{ c.carDetals?.vinCode }}</span>
+      </div>
+      }
+
+    </div>
+
+    @if (c.carDetals?.description) {
+    <div class="cardetals__description">
+      <h3>Description</h3>
+      <p>{{ c.carDetals?.description }}</p>
+    </div>
+    }
+
+    @if (c.carDetals?.userPhone) {
+    <div class="cardetals__contact">
+      <span class="cardetals__label">Phone</span>
+      <a [href]="'tel:' + c.carDetals?.userPhone">{{ c.carDetals?.userPhone }}</a>
+    </div>
+    }
+
+  </div>
+
+</div>
+
+@if (lightboxOpen()) {
+<div class="cardetals__lightbox" (click)="closeLightbox()">
+  <button type="button" class="cardetals__lightbox-close" (click)="closeLightbox()">×</button>
+
+  <button type="button" class="cardetals__lightbox-nav cardetals__lightbox-nav--prev"
+    (click)="prevImage(); $event.stopPropagation()">
+    <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+
+  <img [src]="activeImage()" [alt]="c.carModel" (click)="$event.stopPropagation()" />
+
+  <button type="button" class="cardetals__lightbox-nav cardetals__lightbox-nav--next"
+    (click)="nextImage(); $event.stopPropagation()">
+    <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+</div>
+}
+
+}

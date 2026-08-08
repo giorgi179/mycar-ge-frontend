@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, AfterViewInit, ElementRef, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { HomeService, ManufacturerCount, HomeStats } from '../../services/home-service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -8,6 +8,8 @@ import { CarListItem, FilterCriteria } from '../home-filtre/home-filtre';
 import { ViewChild } from '@angular/core';
 import { HomeFiltre } from '../home-filtre/home-filtre';
 import { environment } from '../../../environments/environment.development';
+import { isPlatformBrowser } from '@angular/common';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -21,6 +23,8 @@ export class Home implements OnInit, AfterViewInit {
   private langService = inject(LanguageService);
   private router = inject(Router);
   private elementRef = inject(ElementRef);
+  private platformId = inject(PLATFORM_ID);
+
   auth = inject(AuthService);
   imageBaseUrl = environment.imageUrl;
   carList = signal<CarListItem[]>([]);
@@ -95,8 +99,12 @@ export class Home implements OnInit, AfterViewInit {
     this.loadBrands();
     this.loadStats();
   }
-
+  
   ngAfterViewInit(): void {
+    // IntersectionObserver მხოლოდ ბრაუზერშია ხელმისაწვდომი — SSR/prerender-ის დროს (Node.js) არ არსებობს
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
     this.observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {

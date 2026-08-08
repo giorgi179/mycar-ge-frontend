@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /profile
+Disallow: /add-car
+Disallow: /auth
+Disallow: /register
+
+Sitemap: https://mycar.ge/sitemap.xml

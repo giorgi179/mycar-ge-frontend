@@ -1,0 +1,222 @@
+<div class="profile-page">
+
+    <!-- ============ HEADER ============ -->
+    <header class="pro-header">
+        <div class="pro-header__identity">
+            <div class="pro-avatar">
+                @if (profile()?.userUrl) {
+                <img [src]="profile()!.userUrl" [alt]="profile()?.firstName" />
+                } @else {
+                <span class="pro-avatar__fallback">
+                    {{ profile()?.firstName?.charAt(0) }}{{ profile()?.lastName?.charAt(0) }}
+                </span>
+                }
+                <span class="pro-avatar__ring" [class.is-verified]="profile()?.isVerified"></span>
+            </div>
+
+            <div class="pro-header__text">
+                @if (loadingProfile()) {
+                <div class="skeleton skeleton--name"></div>
+                <div class="skeleton skeleton--email"></div>
+                } @else if (profile()) {
+                <h1>{{ profile()!.firstName }} {{ profile()!.lastName }}</h1>
+                <p class="pro-header__email">{{ profile()!.email }}</p>
+                <span class="badge" [class.badge--verified]="profile()!.isVerified">
+                    {{ profile()!.isVerified ? ('profile.verified' | translate) : ('profile.unverified' | translate) }}
+                </span>
+                }
+            </div>
+        </div>
+
+        <button class="btn btn--ghost btn--logout" (click)="logout()">{{ 'profile.logout' | translate }}</button>
+    </header>
+
+    <!-- ============ DASHBOARD GAUGES ============ -->
+    <section class="gauges" aria-label="ანგარიშის სტატისტიკა">
+        <div class="gauge">
+            <span class="gauge__value">{{ totalCars() }}</span>
+            <span class="gauge__label">{{ 'profile.statListings' | translate }}</span>
+        </div>
+        <div class="gauge">
+            <span class="gauge__value">{{ totalValue() | number }}<small>₾</small></span>
+            <span class="gauge__label">{{ 'profile.statValue' | translate }}</span>
+        </div>
+        <div class="gauge">
+            <span class="gauge__value">{{ newestCar()?.carModel || '—' }}</span>
+            <span class="gauge__label">{{ 'profile.statNewest' | translate }}</span>
+        </div>
+    </section>
+
+    @if (errorMsg()) {
+    <div class="alert alert--error" role="alert">
+        {{ errorMsg() }}
+        <button (click)="errorMsg.set(null)" [attr.aria-label]="'profile.closeAlert' | translate">&times;</button>
+    </div>
+    }
+
+    <!-- ============ TABS ============ -->
+    <nav class="tabs" role="tablist" aria-label="პროფილის სექციები">
+        <button role="tab" [attr.aria-selected]="activeTab() === 'overview'" class="tabs__item"
+            [class.is-active]="activeTab() === 'overview'" (click)="setTab('overview')">{{ 'profile.tabOverview' |
+            translate }}</button>
+        <button role="tab" [attr.aria-selected]="activeTab() === 'cars'" class="tabs__item"
+            [class.is-active]="activeTab() === 'cars'" (click)="setTab('cars')">{{ 'profile.tabCars' | translate
+            }}</button>
+        <button role="tab" [attr.aria-selected]="activeTab() === 'add'" class="tabs__item"
+            [class.is-active]="activeTab() === 'add'" (click)="setTab('add')">{{ 'profile.tabAdd' | translate
+            }}</button>
+        <button role="tab" [attr.aria-selected]="activeTab() === 'settings'" class="tabs__item"
+            [class.is-active]="activeTab() === 'settings'" (click)="setTab('settings')">{{ 'profile.tabSettings' |
+            translate }}</button>
+    </nav>
+
+    <!-- ============ OVERVIEW ============ -->
+    @if (activeTab() === 'overview') {
+    <section class="panel">
+        @if (loadingCars()) {
+        <div class="empty-state">{{ 'home.loading' | translate }}</div>
+        } @else if (cars().length === 0) {
+        <div class="empty-state">
+            <p>{{ 'profile.noCarsYet' | translate }}</p>
+            <button class="btn btn--primary" (click)="setTab('add')">{{ 'profile.addFirstListing' | translate
+                }}</button>
+        </div>
+        } @else {
+        <h2 class="panel__title">{{ 'profile.recentActivity' | translate }}</h2>
+        <div class="car-grid car-grid--compact">
+            @for (car of cars().slice(0, 3); track trackByCarId($index, car)) {
+            <article class="car-card">
+                <div class="car-card__img">
+                    <img [src]="car.carImg" [alt]="car.carModel" loading="lazy" />
+                </div>
+                <div class="car-card__body">
+                    <h3>{{ car.carModel }}</h3>
+                    <p class="car-card__meta">{{ car.carAge }} · {{ car.fuelType }} · {{ car.city }}</p>
+                    <p class="car-card__price">{{ car.carPrice | number }} ₾</p>
+                </div>
+            </article>
+            }
+        </div>
+        }
+    </section>
+    }
+
+    <!-- ============ MY CARS ============ -->
+    @if (activeTab() === 'cars') {
+    <section class="panel">
+        <div class="panel__head">
+            <h2 class="panel__title">{{ 'profile.myListings' | translate }}</h2>
+            <button class="btn btn--primary btn--sm" (click)="setTab('add')">{{ 'profile.newListing' | translate
+                }}</button>
+        </div>
+
+        @if (loadingCars()) {
+        <div class="car-grid">
+            @for (i of [1,2,3]; track i) {
+            <div class="car-card car-card--skeleton"></div>
+            }
+        </div>
+        } @else if (cars().length === 0) {
+        <div class="empty-state">
+            <p>{{ 'profile.noListingsFound' | translate }}</p>
+            <button class="btn btn--primary" (click)="setTab('add')">{{ 'profile.addFirstListing' | translate
+                }}</button>
+        </div>
+        } @else {
+        <div class="car-grid">
+            @for (car of cars(); track trackByCarId($index, car)) {
+            <article class="car-card">
+                <div class="car-card__img">
+                    <img [src]="car.carImg" [alt]="car.carModel" loading="lazy" />
+                    <span class="car-card__tag">{{ car.carType }}</span>
+                </div>
+                <div class="car-card__body">
+                    <h3>{{ car.carModel }}</h3>
+                    <p class="car-card__meta">{{ car.carAge }} · {{ car.fuelType }} · {{ car.city }}</p>
+                    @if (car.carDetals?.vinCode) {
+                    <p class="car-card__vin">VIN {{ car.carDetals?.vinCode }}</p>
+                    }
+                    <p class="car-card__price">{{ car.carPrice | number }} ₾</p>
+                </div>
+                <div class="car-card__actions">
+                    <button class="btn btn--ghost btn--sm" type="button" (click)="startEdit(car)">{{ 'profile.editBtn' |
+                        translate }}</button>
+                    <button class="btn btn--danger btn--sm" type="button" (click)="confirmDelete(car)">{{
+                        'profile.deleteBtn' | translate }}</button>
+                </div>
+            </article>
+            }
+        </div>
+        }
+    </section>
+    }
+
+    <!-- ============ ADD CAR ============ -->
+    @if (activeTab() === 'add') {
+    <section class="panel">
+        <app-add-car [editingCar]="carPendingEdit()" (editComplete)="onEditComplete()"></app-add-car>
+    </section>
+    }
+
+    <!-- ============ SETTINGS ============ -->
+    @if (activeTab() === 'settings') {
+    <section class="panel panel--narrow">
+        <h2 class="panel__title">{{ 'profile.editProfile' | translate }}</h2>
+
+        <form [formGroup]="editForm" (ngSubmit)="saveProfile()" class="form">
+            <div class="photo-edit">
+                <div class="photo-edit__preview">
+                    @if (photoPreview()) {
+                    <img [src]="photoPreview()" alt="" />
+                    } @else if (profile()?.userUrl) {
+                    <img [src]="profile()!.userUrl" alt="" />
+                    } @else {
+                    <span>{{ profile()?.firstName?.charAt(0) }}</span>
+                    }
+                </div>
+                <label class="btn btn--ghost btn--sm">
+                    {{ 'profile.changePhoto' | translate }}
+                    <input type="file" accept="image/*" (change)="onPhotoSelected($event)" hidden />
+                </label>
+            </div>
+
+            <div class="form__grid">
+                <label class="field">
+                    <span>{{ 'profile.firstName' | translate }}</span>
+                    <input type="text" formControlName="firstName" />
+                </label>
+                <label class="field">
+                    <span>{{ 'profile.lastName' | translate }}</span>
+                    <input type="text" formControlName="lastName" />
+                </label>
+                <label class="field field--full">
+                    <span>{{ 'profile.email' | translate }}</span>
+                    <input type="email" [value]="profile()?.email" disabled />
+                </label>
+            </div>
+
+            <div class="form__actions">
+                <button type="submit" class="btn btn--primary" [disabled]="savingProfile()">
+                    {{ savingProfile() ? ('profile.saving' | translate) : ('profile.saveChanges' | translate) }}
+                </button>
+            </div>
+        </form>
+    </section>
+    }
+
+    <!-- ============ DELETE CONFIRM MODAL ============ -->
+    @if (carPendingDelete()) {
+    <div class="modal-backdrop" (click)="cancelDelete()">
+        <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+            <h3>{{ 'profile.deleteTitle' | translate }}</h3>
+            <p>{{ 'profile.deleteConfirm' | translate }} <strong>{{ carPendingDelete()?.carModel }}</strong>?</p>
+            <div class="modal__actions">
+                <button class="btn btn--ghost" (click)="cancelDelete()">{{ 'profile.cancel' | translate }}</button>
+                <button class="btn btn--danger" (click)="deleteCar(carPendingDelete()!.id)">{{ 'profile.confirmDelete' |
+                    translate }}</button>
+            </div>
+        </div>
+    </div>
+    }
+
+</div>

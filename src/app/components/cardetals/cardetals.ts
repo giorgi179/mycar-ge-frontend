@@ -5,6 +5,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language-service';
 import { CarModels } from '../../services/components';
 import { environment } from '../../../environments/environment.development';
+import { SeoService } from '../../services/seo-service';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class Cardetals implements OnInit {
   private router = inject(Router);
   private api = inject(HomeService);
   private langService = inject(LanguageService);
+  private seo = inject(SeoService);
 
   imageBaseUrl = environment.imageUrl;
   car = signal<CarModels | null>(null);
@@ -52,6 +54,7 @@ export class Cardetals implements OnInit {
         this.activeIndex.set(0);
         this.activeImage.set(data.carImg);
         this.loading.set(false);
+        this.updateSeoForCar(data);
       },
       error: (err) => {
         this.error.set(this.langService.translate('home.error'));
@@ -59,6 +62,49 @@ export class Cardetals implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  /** ავსებს title/meta/OG-ს და Vehicle JSON-LD schema-ს კონკრეტული მანქანის მონაცემებით */
+  private updateSeoForCar(car: CarModels): void {
+    const manufacturer = car.carDetals?.manufacturer ? `${car.carDetals.manufacturer} ` : '';
+    const title = `${manufacturer}${car.carModel} ${car.carAge} — ${car.carPrice}₾`;
+    const description = `${manufacturer}${car.carModel}, ${car.carAge} წელი, ${car.fuelType}, ${car.carDetals?.mileage ?? ''} გარბენი, ${car.city}. ${car.carDetals?.description?.slice(0, 100) ?? ''}`.trim();
+    const image = car.carImg?.startsWith('http') ? car.carImg : `${this.imageBaseUrl}${car.carImg}`;
+
+    this.seo.update({
+      title,
+      description,
+      keywords: `${manufacturer}${car.carModel}, ${car.carModel} ${car.carAge}, ${car.carType}, ${car.fuelType}, მანქანა ${car.city}, ${manufacturer}ყიდვა`,
+      image,
+      url: `/car/${car.id}`,
+      type: 'product'
+    });
+
+    this.seo.setJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'Vehicle',
+      name: `${manufacturer}${car.carModel} ${car.carAge}`,
+      brand: car.carDetals?.manufacturer,
+      model: car.carModel,
+      vehicleModelDate: car.carAge,
+      mileageFromOdometer: car.carDetals?.mileage,
+      fuelType: car.fuelType,
+      vehicleTransmission: car.carDetals?.transmission,
+      color: car.carDetals?.color,
+      image: (car.images?.length ? car.images.map(i => i.imageUrl.startsWith('http') ? i.imageUrl : `${this.imageBaseUrl}${i.imageUrl}`) : [image]),
+      description: car.carDetals?.description,
+      offers: {
+        '@type': 'Offer',
+        price: car.carPrice,
+        priceCurrency: 'GEL',
+        availability: 'https://schema.org/InStock',
+        url: `https://mycar.ge/car/${car.id}`
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.seo.removeJsonLd();
   }
 
   setActiveImage(index: number, url: string): void {

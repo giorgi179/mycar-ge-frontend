@@ -1,0 +1,216 @@
+<div class="car-filter">
+
+    <div class="car-filter__top">
+        <h2 class="car-filter__title">{{ 'filter.cars' | translate }}</h2>
+
+        <button type="button" class="car-filter__clear" (click)="onClearFilters()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M2 4h12M6.5 4V2.5a1 1 0 011-1h1a1 1 0 011 1V4M3.5 4l.6 8.4a1.5 1.5 0 001.5 1.6h4.8a1.5 1.5 0 001.5-1.6L12.5 4"
+                    stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            {{ 'filter.clearFilters' | translate }}
+        </button>
+    </div>
+
+    <div class="car-filter__body">
+
+        <div class="car-filter__fields">
+
+            <div class="car-filter__row">
+
+                <div class="car-filter__dropdown"
+                    [class.car-filter__dropdown--open]="openDropdown() === 'manufacturer'">
+                    <button type="button" class="car-filter__select" (click)="toggleDropdown('manufacturer')">
+                        <span [class.car-filter__select-placeholder]="!selectedManufacturer()">
+                            {{ selectedManufacturer() || ('filter.manufacturer' | translate) }}
+                        </span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.5 5.25L7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.3"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    @if (openDropdown() === 'manufacturer') {
+                    <div class="car-filter__menu">
+                        <button type="button" class="car-filter__menu-item" (click)="selectManufacturer(null)">{{
+                            'filter.all' | translate }}</button>
+                        @for (m of manufacturers(); track m) {
+                        <button type="button" class="car-filter__menu-item"
+                            [class.car-filter__menu-item--active]="selectedManufacturer() === m"
+                            (click)="selectManufacturer(m)">{{ m }}</button>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="car-filter__dropdown" [class.car-filter__dropdown--open]="openDropdown() === 'model'"
+                    [class.car-filter__dropdown--filled]="selectedManufacturer()">
+                    <button type="button" class="car-filter__select" (click)="toggleDropdown('model')">
+                        <span [class.car-filter__select-placeholder]="!selectedModel()">
+                            {{ selectedModel() || ('filter.model' | translate) }}
+                        </span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.5 5.25L7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.3"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    @if (openDropdown() === 'model') {
+                    <div class="car-filter__menu">
+                        <button type="button" class="car-filter__menu-item" (click)="selectModel(null)">{{ 'filter.all'
+                            | translate }}</button>
+                        @for (m of models(); track m) {
+                        <button type="button" class="car-filter__menu-item"
+                            [class.car-filter__menu-item--active]="selectedModel() === m" (click)="selectModel(m)">{{ m
+                            }}</button>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="car-filter__dropdown" [class.car-filter__dropdown--open]="openDropdown() === 'location'">
+                    <button type="button" class="car-filter__select" (click)="toggleDropdown('location')">
+                        <span [class.car-filter__select-placeholder]="!selectedLocation()">
+                            {{ selectedLocation() || ('filter.location' | translate) }}
+                        </span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.5 5.25L7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.3"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    @if (openDropdown() === 'location') {
+                    <div class="car-filter__menu">
+                        <button type="button" class="car-filter__menu-item" (click)="selectLocation(null)">{{
+                            'filter.all' | translate }}</button>
+                        @for (l of locations(); track l) {
+                        <button type="button" class="car-filter__menu-item"
+                            [class.car-filter__menu-item--active]="selectedLocation() === l"
+                            (click)="selectLocation(l)">{{ l }}</button>
+                        }
+                    </div>
+                    }
+                </div>
+
+            </div>
+
+            <div class="car-filter__row">
+
+                <div class="car-filter__dropdown" [class.car-filter__dropdown--open]="openDropdown() === 'year'">
+                    <button type="button" class="car-filter__select" (click)="toggleDropdown('year')">
+                        <span [class.car-filter__select-placeholder]="!selectedYear()">
+                            {{ selectedYear() || ('filter.year' | translate) }}
+                        </span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.5 5.25L7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.3"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    @if (openDropdown() === 'year') {
+                    <div class="car-filter__menu">
+                        <button type="button" class="car-filter__menu-item" (click)="selectYear(null)">{{ 'filter.all' |
+                            translate }}</button>
+                        @for (y of years(); track y) {
+                        <button type="button" class="car-filter__menu-item"
+                            [class.car-filter__menu-item--active]="selectedYear() === y" (click)="selectYear(y)">{{ y
+                            }}</button>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="car-filter__dropdown" [class.car-filter__dropdown--open]="openDropdown() === 'price'">
+                    <button type="button" class="car-filter__select" (click)="toggleDropdown('price')">
+                        <span [class.car-filter__select-placeholder]="!selectedPrice()">
+                            {{ selectedPrice() || ('filter.price' | translate) }}
+                        </span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.5 5.25L7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.3"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    @if (openDropdown() === 'price') {
+                    <div class="car-filter__menu">
+                        <button type="button" class="car-filter__menu-item" (click)="selectPrice(null)">{{ 'filter.all'
+                            | translate }}</button>
+                        <button type="button" class="car-filter__menu-item" (click)="selectPrice('0-10000')">$0 –
+                            $10,000</button>
+                        <button type="button" class="car-filter__menu-item" (click)="selectPrice('10000-25000')">$10,000
+                            – $25,000</button>
+                        <button type="button" class="car-filter__menu-item" (click)="selectPrice('25000-50000')">$25,000
+                            – $50,000</button>
+                        <button type="button" class="car-filter__menu-item"
+                            (click)="selectPrice('50000+')">$50,000+</button>
+                    </div>
+                    }
+                </div>
+
+                <div class="car-filter__dropdown" [class.car-filter__dropdown--open]="openDropdown() === 'fuel'">
+                    <button type="button" class="car-filter__select" (click)="toggleDropdown('fuel')">
+                        <span [class.car-filter__select-placeholder]="!selectedFuel()">
+                            {{ selectedFuel() || ('filter.fuel' | translate) }}
+                        </span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.5 5.25L7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.3"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    @if (openDropdown() === 'fuel') {
+                    <div class="car-filter__menu">
+                        <button type="button" class="car-filter__menu-item" (click)="selectFuel(null)">{{ 'filter.all' |
+                            translate }}</button>
+                        @for (f of fuelTypes(); track f) {
+                        <button type="button" class="car-filter__menu-item"
+                            [class.car-filter__menu-item--active]="selectedFuel() === f" (click)="selectFuel(f)">{{ f
+                            }}</button>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <button type="button" class="car-filter__additional" (click)="openAdditionalFilters()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 4.5h12M2 8h12M2 11.5h12" stroke="currentColor" stroke-width="1.3"
+                            stroke-linecap="round" />
+                        <circle cx="5.5" cy="4.5" r="1.4" fill="currentColor" />
+                        <circle cx="10.5" cy="8" r="1.4" fill="currentColor" />
+                        <circle cx="6.5" cy="11.5" r="1.4" fill="currentColor" />
+                    </svg>
+                    {{ 'filter.additionalFilters' | translate }}
+                </button>
+
+            </div>
+
+            <div class="car-filter__row car-filter__row--bottom">
+
+                <div class="car-filter__toggles">
+                    <label class="car-filter__toggle-item">
+                        <button type="button" class="car-filter__switch car-filter__switch--sm"
+                            [class.car-filter__switch--on]="vinOnly()" (click)="toggleVinOnly()">
+                            <span class="car-filter__switch-knob"></span>
+                        </button>
+                        <span>{{ 'filter.listingsWithVin' | translate }}</span>
+                    </label>
+
+                    <label class="car-filter__toggle-item">
+                        <button type="button" class="car-filter__switch car-filter__switch--sm"
+                            [class.car-filter__switch--on]="priceNegotiableHidden()"
+                            (click)="togglePriceNegotiableHidden()">
+                            <span class="car-filter__switch-knob"></span>
+                        </button>
+                        <span>{{ 'filter.hidePriceNegotiable' | translate }}</span>
+                    </label>
+                </div>
+
+                <button type="button" class="car-filter__search" (click)="onSearch()">
+                    {{ 'filter.search' | translate }} ({{ totalCount() }})
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<app-additional-filters-criteria [isOpen]="isAdditionalFiltersOpen()" (close)="onAdditionalFiltersClose()"
+    (apply)="onAdditionalFiltersApply($event)" (clearFilters)="onClearFilters()">
+</app-additional-filters-criteria>

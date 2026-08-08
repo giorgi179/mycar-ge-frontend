@@ -1,0 +1,1056 @@
+// ============================================================================
+// add-car.scss — MyCar.ge · განცხადების დამატება
+// Luxury-showroom დიზაინ-სისტემა: მუქი გვერდითი პანელი + ოქროსფერი აქცენტი
+// Mobile-first, სრული რესპონსიულობა 320px-მდე
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// Design tokens
+// ---------------------------------------------------------------------------
+$ink-900:      #12141a;   // მთავარი მუქი (rail-ის ფონი)
+$ink-800:      #1b1e26;
+$ink-700:      #262a35;
+$ink-border:   #323744;
+
+$paper:        #ffffff;
+$paper-soft:   #f7f6f3;   // თბილი off-white ფონი
+$paper-line:   #e7e4dc;
+
+$ink:          #1c1d1f;   // ტექსტი მთავარ ზონაში
+$ink-muted:    #6b6f76;
+$ink-faint:    #9a9da3;
+
+$gold:         #c9a227;
+$gold-soft:    #e2c56b;
+$gold-deep:    #a5811c;
+$gold-tint:    rgba(201, 162, 39, 0.12);
+
+$danger:       #d8493a;
+$danger-tint:  rgba(216, 73, 58, 0.08);
+$success:      #3f8f5f;
+
+$radius-sm:    8px;
+$radius-md:    12px;
+$radius-lg:    18px;
+
+$font-display: 'Marcellus', 'Playfair Display', Georgia, serif;
+$font-body:    'Manrope', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+$ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid $gold;
+    outline-offset: 2px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Layout shell
+// ---------------------------------------------------------------------------
+.add-car {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 28px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  font-family: $font-body;
+  color: $ink;
+  background: $paper-soft;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media (max-width: 480px) {
+    padding: 18px 14px 40px;
+    gap: 18px;
+  }
+
+  @media (max-width: 320px) {
+    padding: 14px 10px 32px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rail (გვერდითი პანელი)
+// ---------------------------------------------------------------------------
+.add-car__rail {
+  background: linear-gradient(180deg, $ink-900 0%, $ink-800 100%);
+  border-radius: $radius-lg;
+  padding: 20px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+  color: $paper;
+  box-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.45);
+
+  @media (max-width: 960px) {
+    position: static;
+    order: -1;
+  }
+
+  @media (max-width: 480px) {
+    padding: 16px;
+    border-radius: $radius-md;
+  }
+}
+
+.add-car__rail-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid $ink-border;
+  border-radius: $radius-sm;
+  padding: 12px 14px;
+  color: $paper;
+  font-family: $font-body;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s $ease, background 0.2s $ease;
+  @include focus-ring;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    transition: transform 0.25s $ease;
+  }
+
+  &:hover {
+    border-color: $gold;
+    background: rgba(201, 162, 39, 0.06);
+  }
+
+  &--open {
+    border-color: $gold;
+
+    svg { transform: rotate(180deg); }
+  }
+}
+
+.add-car__saved-panel {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid $ink-border;
+  border-radius: $radius-sm;
+  background: rgba(255, 255, 255, 0.03);
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb {
+    background: $ink-border;
+    border-radius: 4px;
+  }
+}
+
+.add-car__saved-loading,
+.add-car__saved-error,
+.add-car__saved-empty {
+  font-size: 0.82rem;
+  color: $ink-faint;
+  text-align: center;
+  padding: 14px 6px;
+}
+
+.add-car__saved-error { color: $danger; }
+
+.add-car__saved-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: $radius-sm;
+  padding: 8px;
+  text-align: left;
+  cursor: pointer;
+  color: $paper;
+  transition: background 0.2s $ease;
+  @include focus-ring;
+
+  &:hover { background: rgba(255, 255, 255, 0.06); }
+
+  img {
+    width: 44px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  &-noimg {
+    width: 44px;
+    height: 34px;
+    border-radius: 6px;
+    background: $ink-700;
+    flex-shrink: 0;
+  }
+
+  div {
+    min-width: 0;
+
+    strong {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    span {
+      display: block;
+      font-size: 0.74rem;
+      color: $ink-faint;
+    }
+  }
+}
+
+// --- Steps ---
+.add-car__rail-steps {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.add-car__rail-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  padding: 10px 4px;
+  color: $ink-faint;
+  cursor: pointer;
+  text-align: left;
+  font-family: $font-body;
+  font-size: 0.86rem;
+  @include focus-ring;
+
+  &:not(:last-child) .add-car__rail-connector {
+    position: absolute;
+    left: 15px;
+    top: 34px;
+    width: 2px;
+    height: calc(100% - 10px);
+    background: $ink-border;
+  }
+
+  &--done {
+    color: $paper;
+
+    .add-car__rail-marker {
+      background: $gold;
+      border-color: $gold;
+      color: $ink-900;
+    }
+
+    &:not(:last-child) .add-car__rail-connector { background: $gold-deep; }
+  }
+
+  &--current {
+    color: $paper;
+    font-weight: 700;
+
+    .add-car__rail-marker {
+      border-color: $gold;
+      box-shadow: 0 0 0 4px $gold-tint;
+    }
+
+    .add-car__rail-label { color: $gold-soft; }
+  }
+
+  &:hover:not(&--current) { color: $paper; }
+}
+
+.add-car__rail-marker {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid $ink-border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $ink-900;
+  z-index: 1;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0;
+    transition: opacity 0.2s $ease;
+  }
+}
+
+.add-car__rail-step--done .add-car__rail-marker svg { opacity: 1; }
+
+.add-car__rail-label { transition: color 0.2s $ease; }
+
+// --- Preview card ---
+.add-car__rail-preview {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid $ink-border;
+}
+
+.add-car__rail-preview-label {
+  font-family: $font-display;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $gold-soft;
+  margin: 0 0 10px;
+}
+
+.add-car__rail-preview-img {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: $radius-sm;
+  background: $ink-700;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  svg {
+    width: 34px;
+    height: 34px;
+    color: $ink-border;
+  }
+}
+
+.add-car__rail-preview-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: $gold;
+  color: $ink-900;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.add-car__rail-preview-body {
+  margin-top: 12px;
+
+  h3 {
+    font-family: $font-display;
+    font-size: 1.05rem;
+    margin: 0 0 6px;
+    color: $paper;
+  }
+
+  &-placeholder {
+    color: $ink-faint;
+    font-weight: 400;
+    font-style: italic;
+  }
+}
+
+.add-car__rail-preview-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: $ink-faint;
+  margin: 0 0 8px;
+
+  svg { width: 13px; height: 13px; flex-shrink: 0; }
+}
+
+.add-car__rail-preview-price {
+  font-family: $font-display;
+  font-size: 1.3rem;
+  color: $gold-soft;
+  margin: 0 0 4px;
+}
+
+.add-car__rail-preview-meta {
+  font-size: 0.78rem;
+  color: $ink-faint;
+  margin: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Main column
+// ---------------------------------------------------------------------------
+.add-car__main {
+  min-width: 0;
+}
+
+.add-car__heading {
+  margin-bottom: 20px;
+
+  h1 {
+    font-family: $font-display;
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.1rem);
+    margin: 0 0 6px;
+    color: $ink;
+  }
+
+  p {
+    margin: 0;
+    color: $ink-muted;
+    font-size: 0.94rem;
+  }
+}
+
+// --- Sale type ---
+.add-car__saletype-row { margin-bottom: 16px; }
+
+.add-car__radio-group {
+  display: inline-flex;
+  background: $paper;
+  border: 1px solid $paper-line;
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.add-car__radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: $ink-muted;
+  cursor: pointer;
+  transition: background 0.2s $ease, color 0.2s $ease;
+  @include focus-ring;
+
+  &-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 2px solid $ink-faint;
+    transition: all 0.2s $ease;
+  }
+
+  &--active {
+    background: $ink-900;
+    color: $paper;
+
+    .add-car__radio-dot {
+      background: $gold;
+      border-color: $gold;
+    }
+  }
+
+  @media (max-width: 380px) {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+// --- VIN block ---
+.add-car__vin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(135deg, $ink-900, $ink-700);
+  border-radius: $radius-lg;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  color: $paper;
+
+  @media (max-width: 720px) {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px;
+  }
+}
+
+.add-car__vin-copy {
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: $font-display;
+    font-size: 1.1rem;
+    margin: 0 0 6px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.65);
+    max-width: 320px;
+  }
+}
+
+.add-car__vin-badge {
+  background: $gold;
+  color: $ink-900;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.add-car__vin-action {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 280px;
+
+  @media (max-width: 720px) { min-width: 0; }
+}
+
+.add-car__vin-input-row {
+  display: flex;
+  gap: 8px;
+
+  @media (max-width: 380px) { flex-direction: column; }
+}
+
+.add-car__vin-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+
+  input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: $radius-sm;
+    padding: 11px 38px 11px 14px;
+    color: $paper;
+    font-size: 0.88rem;
+    font-family: $font-body;
+    transition: border-color 0.2s $ease;
+
+    &::placeholder { color: rgba(255, 255, 255, 0.4); }
+    &:focus {
+      outline: none;
+      border-color: $gold;
+    }
+  }
+
+  svg {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+  }
+}
+
+.add-car__vin-add-btn {
+  background: $gold;
+  color: $ink-900;
+  border: none;
+  border-radius: $radius-sm;
+  padding: 0 20px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: background 0.2s $ease, transform 0.15s $ease;
+  @include focus-ring;
+
+  &:hover { background: $gold-soft; }
+  &:active { transform: scale(0.97); }
+}
+
+.add-car__vin-find {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 2px 0;
+  width: fit-content;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  @include focus-ring;
+
+  svg { width: 14px; height: 14px; }
+
+  &:hover { color: $gold-soft; }
+}
+
+// --- Error banner ---
+.add-car__error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: $danger-tint;
+  border: 1px solid rgba(216, 73, 58, 0.3);
+  color: $danger;
+  border-radius: $radius-sm;
+  padding: 11px 14px;
+  font-size: 0.85rem;
+  margin: 0 0 18px;
+
+  svg { flex-shrink: 0; }
+}
+
+// ---------------------------------------------------------------------------
+// Form sections
+// ---------------------------------------------------------------------------
+.add-car__form { display: block; }
+
+.add-car__section {
+  background: $paper;
+  border: 1px solid $paper-line;
+  border-radius: $radius-lg;
+  padding: 22px 24px 26px;
+  margin-bottom: 18px;
+  animation: add-car-fade-in 0.3s $ease;
+
+  @media (max-width: 480px) {
+    padding: 16px 16px 20px;
+    border-radius: $radius-md;
+  }
+}
+
+@keyframes add-car-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.add-car__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid $paper-line;
+
+  @media (max-width: 420px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+.add-car__section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: $font-display;
+  font-size: 1.15rem;
+  color: $ink;
+
+  svg {
+    width: 19px;
+    height: 19px;
+    color: $gold-deep;
+    flex-shrink: 0;
+  }
+}
+
+.add-car__section-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: $ink-muted;
+  white-space: nowrap;
+}
+
+.add-car__progress-ring {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: $paper-line;
+  border: 2px solid $paper-line;
+
+  &--complete {
+    background: $success;
+    border-color: $success;
+  }
+}
+
+.add-car__section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.add-car__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.add-car__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+
+  &:last-child { margin-bottom: 0; }
+
+  &--toggle {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: $ink;
+    }
+  }
+}
+
+.add-car__field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $ink;
+}
+
+.add-car__required {
+  color: $danger;
+  margin-left: 2px;
+}
+
+// --- Inputs / selects ---
+.add-car__control {
+  position: relative;
+  background: $paper-soft;
+  border: 1px solid $paper-line;
+  border-radius: $radius-sm;
+  transition: border-color 0.2s $ease, box-shadow 0.2s $ease;
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    font-family: $font-body;
+    color: $ink;
+
+    &:focus { outline: none; }
+    &::placeholder { color: $ink-faint; }
+  }
+
+  select {
+    appearance: none;
+    cursor: pointer;
+  }
+
+  &:focus-within {
+    border-color: $gold;
+    box-shadow: 0 0 0 3px $gold-tint;
+  }
+
+  &--has-chevron select { padding-right: 36px; }
+
+  &--invalid {
+    border-color: $danger;
+    box-shadow: 0 0 0 3px $danger-tint;
+  }
+}
+
+.add-car__chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: $ink-muted;
+  pointer-events: none;
+}
+
+.add-car__field-hint {
+  font-size: 0.76rem;
+  color: $danger;
+  margin: 2px 0 0;
+}
+
+textarea { resize: vertical; min-height: 100px; }
+
+// --- Pill choices ---
+.add-car__pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.add-car__pill {
+  background: $paper-soft;
+  border: 1px solid $paper-line;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: $ink-muted;
+  cursor: pointer;
+  transition: all 0.18s $ease;
+  @include focus-ring;
+
+  &:hover {
+    border-color: $gold-soft;
+    color: $ink;
+  }
+
+  &--active {
+    background: $ink-900;
+    border-color: $ink-900;
+    color: $paper;
+
+    &:hover { color: $paper; }
+  }
+
+  @media (max-width: 380px) {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+// --- Toggle switch ---
+.add-car__switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: $paper-line;
+  cursor: pointer;
+  transition: background 0.2s $ease;
+  flex-shrink: 0;
+
+  span {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: $paper;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s $ease;
+  }
+
+  &--on {
+    background: $gold;
+
+    span { transform: translateX(18px); }
+  }
+}
+
+// --- Photos ---
+input[type='file'] {
+  width: 100%;
+  font-size: 0.84rem;
+  color: $ink-muted;
+  padding: 10px;
+  border: 1px dashed $paper-line;
+  border-radius: $radius-sm;
+  background: $paper-soft;
+  cursor: pointer;
+
+  &::file-selector-button {
+    background: $ink-900;
+    color: $paper;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 12px;
+    margin-right: 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.add-car__photo-hint {
+  font-size: 0.76rem;
+  color: $ink-faint;
+  margin: 6px 0 0;
+}
+
+.add-car__photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+
+  @media (max-width: 380px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+}
+
+.add-car__photo-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  border: 2px solid transparent;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(18, 20, 26, 0.75);
+    color: $paper;
+    line-height: 1;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @include focus-ring;
+
+    &:hover { background: $danger; }
+  }
+
+  &--cover {
+    border-color: $gold;
+
+    &::after {
+      content: 'Cover';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: $gold;
+      color: $ink-900;
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 2px 0;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Navigation buttons
+// ---------------------------------------------------------------------------
+.add-car__nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 6px;
+
+  @media (max-width: 420px) {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}
+
+.add-car__btn {
+  border-radius: 999px;
+  padding: 13px 30px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: $font-body;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.15s $ease, box-shadow 0.2s $ease, background 0.2s $ease;
+  @include focus-ring;
+
+  &:active { transform: scale(0.98); }
+
+  &--ghost {
+    background: transparent;
+    border-color: $paper-line;
+    color: $ink-muted;
+
+    &:hover {
+      border-color: $ink-faint;
+      color: $ink;
+    }
+  }
+
+  &--primary {
+    background: $ink-900;
+    color: $paper;
+
+    &:hover { background: $ink-700; }
+  }
+
+  &--submit {
+    background: linear-gradient(135deg, $gold, $gold-deep);
+    color: $ink-900;
+    box-shadow: 0 10px 24px -12px rgba(201, 162, 39, 0.6);
+
+    &:hover:not(:disabled) { box-shadow: 0 14px 28px -12px rgba(201, 162, 39, 0.75); }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+
+  @media (max-width: 420px) {
+    width: 100%;
+  }
+
+  @media (max-width: 320px) {
+    padding: 12px 20px;
+    font-size: 0.85rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reduced motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .add-car__section { animation: none; }
+  * { transition-duration: 0.01ms !important; }
+}
