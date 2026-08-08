@@ -1,5 +1,5 @@
 export const environment = {
-    production: false,
+    production: true,
     apiUrl: 'https://mycar-ge-api.onrender.com/api',
     imageUrl: 'https://mycar-ge-api.onrender.com'
 };
