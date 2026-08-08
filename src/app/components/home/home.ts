@@ -9,6 +9,7 @@ import { ViewChild } from '@angular/core';
 import { HomeFiltre } from '../home-filtre/home-filtre';
 import { environment } from '../../../environments/environment.development';
 import { isPlatformBrowser } from '@angular/common';
+import { SeoService } from '../../services/seo-service';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +19,8 @@ import { isPlatformBrowser } from '@angular/common';
   styleUrl: './home.scss',
 })
 export class Home implements OnInit, AfterViewInit {
-
+  
+  private seo = inject(SeoService);
   private api = inject(HomeService);
   private langService = inject(LanguageService);
   private router = inject(Router);
@@ -95,11 +97,17 @@ export class Home implements OnInit, AfterViewInit {
   private observer?: IntersectionObserver;
 
   ngOnInit(): void {
+    this.seo.update({
+      title: 'MyCar.ge — მანქანების ყიდვა-გაყიდვა საქართველოში',
+      description: 'იყიდე და გაყიდე მანქანა მარტივად MyCar.ge-ზე. ათასობით განცხადება, გამარტივებული ძებნა მარკის, მოდელის, წლის და ფასის მიხედვით.',
+      image: 'https://mycar-ge-frontend.onrender.com/assets/og-default.jpg',
+      url: '/'
+    });
     this.loadCars();
     this.loadBrands();
     this.loadStats();
   }
-  
+
   ngAfterViewInit(): void {
     // IntersectionObserver მხოლოდ ბრაუზერშია ხელმისაწვდომი — SSR/prerender-ის დროს (Node.js) არ არსებობს
     if (!isPlatformBrowser(this.platformId)) {
