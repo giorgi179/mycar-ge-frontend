@@ -1,6 +1,9 @@
 {
   "name": "angular-car-project",
   "version": "0.0.0",
+  "engines": {
+    "node": "22.22.3"
+  },
   "scripts": {
     "ng": "ng",
     "start": "cross-env NODE_EXTRA_CA_CERTS=./aspnetcore-dev-cert.pem ng serve",
