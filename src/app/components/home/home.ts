@@ -166,8 +166,7 @@ export class Home implements OnInit, AfterViewInit {
     });
   }
   getImageUrl(path: string): string {
-    if (!path) return '';
-    return `${this.imageBaseUrl}/${path.replace(/^\/+/, '')}`;
+    return path || '';
   }
   onCarImgError(event: Event): void {
     const img = event.target as HTMLImageElement;
