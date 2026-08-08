@@ -4,6 +4,7 @@ import { HomeService } from '../../services/home-service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language-service';
 import { CarModels } from '../../services/components';
+import { environment } from '../../../environments/environment.development';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class Cardetals implements OnInit {
   private api = inject(HomeService);
   private langService = inject(LanguageService);
 
+  imageBaseUrl = environment.imageUrl;
   car = signal<CarModels | null>(null);
   error = signal<string | null>(null);
   loading = signal<boolean>(true);

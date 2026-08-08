@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth-service';
 import { CarListItem, FilterCriteria } from '../home-filtre/home-filtre';
 import { ViewChild } from '@angular/core';
 import { HomeFiltre } from '../home-filtre/home-filtre';
+import { environment } from '../../../environments/environment.development';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -21,7 +22,7 @@ export class Home implements OnInit, AfterViewInit {
   private router = inject(Router);
   private elementRef = inject(ElementRef);
   auth = inject(AuthService);
-
+  imageBaseUrl = environment.imageUrl;
   carList = signal<CarListItem[]>([]);
   error = signal<string | null>(null);
   loading = signal<boolean>(true);
@@ -147,7 +148,10 @@ export class Home implements OnInit, AfterViewInit {
 
   private loadStats(): void {
     this.api.getStats().subscribe({
-      next: (data) => this.stats.set(data),
+      next: (data) => {
+        this.stats.set(data);
+        this.observeReveals();
+      },
       error: (err) => console.error(err)
     });
   }
@@ -161,7 +165,14 @@ export class Home implements OnInit, AfterViewInit {
       queryParams: { filter: JSON.stringify(criteria) }
     });
   }
-
+  getImageUrl(path: string): string {
+    if (!path) return '';
+    return `${this.imageBaseUrl}/${path.replace(/^\/+/, '')}`;
+  }
+  onCarImgError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/placeholder-car.png';
+  }
   goToAllCars(): void {
     this.router.navigate(['/cars']);
   }

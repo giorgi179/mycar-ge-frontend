@@ -6,8 +6,8 @@
     </div>
 </section>
 
-<app-home-filtre #homeFiltre [cars]="carList()" [totalCount]="carList().length"
-    (filterChange)="onFilterChange($event)" (clearFilters)="onClearFilters()">
+<app-home-filtre #homeFiltre [cars]="carList()" [totalCount]="carList().length" (filterChange)="onFilterChange($event)"
+    (clearFilters)="onClearFilters()">
 </app-home-filtre>
 
 <section class="home-section">
@@ -42,7 +42,8 @@
         @for (car of limitedCars(); track car.id; let i = $index) {
         <div class="car-card reveal" [style.transition-delay.ms]="i * 60" (click)="goToCarDetails(car.id)">
             <div class="car-card__img-wrap">
-                <img [src]="'https://localhost:7035' + car.carImg" [alt]="car.carModel" loading="lazy" />
+                <img [src]="car.carImg" [alt]="car.carModel" loading="lazy"
+                    (error)="onCarImgError($event)" />
                 <span class="car-card__badge">{{ car.carType }}</span>
             </div>
             <div class="car-card__body">

@@ -5,7 +5,7 @@
         <div class="pro-header__identity">
             <div class="pro-avatar">
                 @if (profile()?.userUrl) {
-                <img [src]="imageBaseUrl + profile()!.userUrl" [alt]="profile()?.firstName" />
+                <img [src]="profile()!.userUrl" [alt]="profile()?.firstName" />
                 } @else {
                 <span class="pro-avatar__fallback">
                     {{ profile()?.firstName?.charAt(0) }}{{ profile()?.lastName?.charAt(0) }}
@@ -87,7 +87,7 @@
             @for (car of cars().slice(0, 3); track trackByCarId($index, car)) {
             <article class="car-card">
                 <div class="car-card__img">
-                    <img [src]="imageBaseUrl + car.carImg" [alt]="car.carModel" loading="lazy" />
+                    <img [src]="car.carImg" [alt]="car.carModel" loading="lazy" />
                 </div>
                 <div class="car-card__body">
                     <h3>{{ car.carModel }}</h3>
@@ -127,7 +127,7 @@
             @for (car of cars(); track trackByCarId($index, car)) {
             <article class="car-card">
                 <div class="car-card__img">
-                    <img [src]="imageBaseUrl + car.carImg" [alt]="car.carModel" loading="lazy" />
+                    <img [src]="car.carImg" [alt]="car.carModel" loading="lazy" />
                     <span class="car-card__tag">{{ car.carType }}</span>
                 </div>
                 <div class="car-card__body">
@@ -169,7 +169,7 @@
                     @if (photoPreview()) {
                     <img [src]="photoPreview()" alt="" />
                     } @else if (profile()?.userUrl) {
-                    <img [src]="imageBaseUrl + profile()!.userUrl" alt="" />
+                    <img [src]="profile()!.userUrl" alt="" />
                     } @else {
                     <span>{{ profile()?.firstName?.charAt(0) }}</span>
                     }
