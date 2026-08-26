@@ -1,4 +1,4 @@
-import { Injectable, signal, inject, PLATFORM_ID, REQUEST } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID, REQUEST, TransferState, makeStateKey } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
@@ -10,6 +10,8 @@ interface TranslationDict {
 }
 
 const LANG_STORAGE_KEY = 'app_lang';
+const TRANSLATIONS_STATE_KEY = makeStateKey<Record<LangCode, TranslationDict>>('translations');
+const EMPTY_TRANSLATIONS: Record<LangCode, TranslationDict> = { ka: {}, en: {} };
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +19,8 @@ const LANG_STORAGE_KEY = 'app_lang';
 export class LanguageService {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
+  private transferState = inject(TransferState);
+  private request = inject(REQUEST, { optional: true });
 
   private translations = signal<Record<LangCode, TranslationDict>>({
     ka: {},
@@ -51,15 +55,26 @@ export class LanguageService {
   private loadLang(lang: LangCode): Promise<void> {
     if (this.loadedLangs.has(lang)) return Promise.resolve();
 
+    const transferred = this.transferState.get(TRANSLATIONS_STATE_KEY, EMPTY_TRANSLATIONS);
+    if (Object.keys(transferred[lang]).length > 0) {
+      this.translations.update(current => ({ ...current, [lang]: transferred[lang] }));
+      this.loadedLangs.add(lang);
+      return Promise.resolve();
+    }
+
     const baseUrl = isPlatformBrowser(this.platformId)
       ? ''
-      : 'https://mycar-ge-frontend.onrender.com'; // production origin
+      : this.request ? new URL(this.request.url).origin : '';
 
     return firstValueFrom(
       this.http.get<TranslationDict>(`${baseUrl}/assets/i18n/${lang}.json`)
     ).then(data => {
       this.translations.update(current => ({ ...current, [lang]: data }));
       this.loadedLangs.add(lang);
+      if (!isPlatformBrowser(this.platformId)) {
+        const current = this.transferState.get(TRANSLATIONS_STATE_KEY, EMPTY_TRANSLATIONS);
+        this.transferState.set(TRANSLATIONS_STATE_KEY, { ...current, [lang]: data });
+      }
     }).catch(err => {
       console.error(`ვერ ჩაიტვირთა თარგმანების ფაილი: ${lang}`, err);
       this.translations.update(current => ({ ...current, [lang]: {} }));
