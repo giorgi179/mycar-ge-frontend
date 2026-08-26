@@ -1,0 +1,21 @@
+@if (!consent.hasChoice()) {
+  <div class="cookie-banner" role="dialog" aria-live="polite" [attr.aria-label]="'cookies.bannerTitle' | translate">
+    <div class="cookie-banner__inner">
+      <div class="cookie-banner__text">
+        <p class="cookie-banner__title">{{ 'cookies.bannerTitle' | translate }}</p>
+        <p class="cookie-banner__desc">
+          {{ 'cookies.bannerText' | translate }}
+          <a routerLink="/cookies" class="cookie-banner__link">{{ 'cookies.bannerLink' | translate }}</a>
+        </p>
+      </div>
+      <div class="cookie-banner__actions">
+        <button type="button" class="cookie-banner__btn cookie-banner__btn--ghost" (click)="rejectNonEssential()">
+          {{ 'cookies.rejectAll' | translate }}
+        </button>
+        <button type="button" class="cookie-banner__btn cookie-banner__btn--primary" (click)="acceptAll()">
+          {{ 'cookies.acceptAll' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,19 @@
+:host { display: block; }
+
+.legal-page {
+  background: #ffffff;
+  min-height: 60vh;
+  padding: 56px 0 80px;
+
+  &__container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+  &__eyebrow { color: #5b8bff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin: 0 0 10px; }
+  &__title { font-size: 34px; font-weight: 800; color: #0f1428; margin: 0 0 8px; }
+  &__updated { font-size: 13px; color: #8a91a6; margin: 0 0 22px; }
+  &__intro { font-size: 15px; line-height: 1.7; color: #4b5166; margin: 0 0 12px; }
+  &__section {
+    margin-top: 36px;
+    h2 { font-size: 19px; font-weight: 700; color: #0f1428; margin: 0 0 10px; }
+    p { font-size: 14.5px; line-height: 1.75; color: #4b5166; }
+    a { color: #5b8bff; font-weight: 600; text-decoration: none; &:hover { text-decoration: underline; } }
+  }
+}

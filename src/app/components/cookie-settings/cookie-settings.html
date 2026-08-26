@@ -1,0 +1,86 @@
+<div class="legal-page">
+  <div class="legal-page__container">
+    <p class="legal-page__eyebrow">{{ 'cookies.eyebrow' | translate }}</p>
+    <h1 class="legal-page__title">{{ 'cookies.pageTitle' | translate }}</h1>
+    <p class="legal-page__intro">{{ 'cookies.pageIntro' | translate }}</p>
+
+    <div class="cookie-cards">
+      <div class="cookie-card">
+        <div class="cookie-card__head">
+          <div>
+            <h3 class="cookie-card__title">{{ 'cookies.necessaryTitle' | translate }}</h3>
+            <p class="cookie-card__desc">{{ 'cookies.necessaryDesc' | translate }}</p>
+          </div>
+          <span class="cookie-card__badge">{{ 'cookies.alwaysActive' | translate }}</span>
+        </div>
+      </div>
+
+      <div class="cookie-card">
+        <div class="cookie-card__head">
+          <div>
+            <h3 class="cookie-card__title">{{ 'cookies.analyticsTitle' | translate }}</h3>
+            <p class="cookie-card__desc">{{ 'cookies.analyticsDesc' | translate }}</p>
+          </div>
+          <button type="button" class="toggle" [class.toggle--on]="analytics()" role="switch"
+            [attr.aria-checked]="analytics()" (click)="toggleAnalytics()">
+            <span class="toggle__knob"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="cookie-card">
+        <div class="cookie-card__head">
+          <div>
+            <h3 class="cookie-card__title">{{ 'cookies.marketingTitle' | translate }}</h3>
+            <p class="cookie-card__desc">{{ 'cookies.marketingDesc' | translate }}</p>
+          </div>
+          <button type="button" class="toggle" [class.toggle--on]="marketing()" role="switch"
+            [attr.aria-checked]="marketing()" (click)="toggleMarketing()">
+            <span class="toggle__knob"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="legal-page__actions">
+      <button type="button" class="btn btn--ghost" (click)="rejectAll()">{{ 'cookies.rejectAll' | translate }}</button>
+      <button type="button" class="btn btn--ghost" (click)="acceptAll()">{{ 'cookies.acceptAll' | translate }}</button>
+      <button type="button" class="btn btn--primary" (click)="savePreferences()">{{ 'cookies.savePreferences' | translate }}</button>
+    </div>
+
+    @if (savedJustNow()) {
+      <p class="legal-page__saved">{{ 'cookies.saved' | translate }}</p>
+    }
+
+    <section class="legal-page__section">
+      <h2>{{ 'cookies.whatAreTitle' | translate }}</h2>
+      <p>{{ 'cookies.whatAreText' | translate }}</p>
+    </section>
+
+    <section class="legal-page__section">
+      <h2>{{ 'cookies.tableTitle' | translate }}</h2>
+      <div class="cookie-table">
+        <div class="cookie-table__row cookie-table__row--head">
+          <span>{{ 'cookies.colName' | translate }}</span>
+          <span>{{ 'cookies.colPurpose' | translate }}</span>
+          <span>{{ 'cookies.colDuration' | translate }}</span>
+        </div>
+        <div class="cookie-table__row">
+          <span>app_lang</span>
+          <span>{{ 'cookies.rowLangPurpose' | translate }}</span>
+          <span>{{ 'cookies.rowPersistent' | translate }}</span>
+        </div>
+        <div class="cookie-table__row">
+          <span>cookie_consent_v1</span>
+          <span>{{ 'cookies.rowConsentPurpose' | translate }}</span>
+          <span>{{ 'cookies.rowPersistent' | translate }}</span>
+        </div>
+        <div class="cookie-table__row">
+          <span>auth_token</span>
+          <span>{{ 'cookies.rowAuthPurpose' | translate }}</span>
+          <span>{{ 'cookies.rowSession' | translate }}</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

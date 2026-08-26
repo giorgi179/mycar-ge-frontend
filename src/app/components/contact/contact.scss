@@ -1,0 +1,79 @@
+:host { display: block; }
+
+.legal-page {
+  background: #ffffff;
+  min-height: 60vh;
+  padding: 56px 0 80px;
+
+  &__container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  &__eyebrow { color: #5b8bff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin: 0 0 10px; }
+  &__title { font-size: 34px; font-weight: 800; color: #0f1428; margin: 0 0 14px; }
+  &__intro { font-size: 15px; line-height: 1.7; color: #4b5166; margin: 0 0 32px; max-width: 560px; }
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 40px;
+
+  @media (max-width: 760px) { grid-template-columns: 1fr; }
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label { font-size: 13px; font-weight: 700; color: #0f1428; }
+
+    input, textarea {
+      border: 1px solid #dfe2ec;
+      border-radius: 9px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1a1d2b;
+      resize: vertical;
+
+      &:focus { outline: none; border-color: #5b8bff; }
+    }
+  }
+
+  &__error { color: #c0392b; font-size: 13px; font-weight: 600; margin: 0; }
+  &__success { color: #1a9c5b; font-size: 13px; font-weight: 600; margin: 0; }
+}
+
+.btn {
+  align-self: flex-start;
+  border: none;
+  border-radius: 9px;
+  padding: 12px 26px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &--primary {
+    background: #5b8bff;
+    color: #ffffff;
+    &:hover:not(:disabled) { background: #4477e8; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &__item {
+    h3 { font-size: 13px; font-weight: 700; color: #8a91a6; text-transform: uppercase; letter-spacing: 0.4px; margin: 0 0 6px; }
+    a, p { font-size: 15px; font-weight: 600; color: #0f1428; text-decoration: none; margin: 0; }
+    a:hover { color: #5b8bff; }
+  }
+}

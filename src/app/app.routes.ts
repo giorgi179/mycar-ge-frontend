@@ -9,6 +9,11 @@ import { Cars } from './components/cars/cars';
 import { Cardetals } from './components/cardetals/cardetals';
 import { guestGuard } from './guards/guest-guard-guard';
 import { Profile } from './components/profile/profile';
+import { Contact } from './components/contact/contact';
+import { Faq } from './components/faq/faq';
+import { TermsOfService } from './components/terms-of-service/terms-of-service';
+import { PrivacyPolicy } from './components/privacy-policy/privacy-policy';
+import { CookieSettings } from './components/cookie-settings/cookie-settings';
 
 export const routes: Routes = [
     {
@@ -41,6 +46,26 @@ export const routes: Routes = [
     {
         path: 'profile', component: Profile, canActivate: [authGuard],
         data: { title: 'ჩემი პროფილი', description: 'მართე შენი პროფილი და განცხადებები MyCar.ge-ზე.', noindex: true }
+    },
+    {
+        path: 'cookies', component: CookieSettings,
+        data: { title: 'ქუქიების პარამეტრები', description: 'მართე ქუქიების პარამეტრები MyCar.ge-ზე.', noindex: true }
+    },
+    {
+        path: 'privacy', component: PrivacyPolicy,
+        data: { title: 'კონფიდენციალურობის პოლიტიკა', description: 'გაეცანი MyCar.ge-ის კონფიდენციალურობის პოლიტიკას.' }
+    },
+    {
+        path: 'terms', component: TermsOfService,
+        data: { title: 'მომსახურების პირობები', description: 'გაეცანი MyCar.ge-ის გამოყენების პირობებს.' }
+    },
+    {
+        path: 'faq', component: Faq,
+        data: { title: 'ხშირად დასმული კითხვები', description: 'ხშირად დასმული კითხვები MyCar.ge-ის შესახებ.' }
+    },
+    {
+        path: 'contact', component: Contact,
+        data: { title: 'დაგვიკავშირდი', description: 'დაუკავშირდი MyCar.ge-ის გუნდს.' }
     },
     {
         path: '**', component: ErorPage,

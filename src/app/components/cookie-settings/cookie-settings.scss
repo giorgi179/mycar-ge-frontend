@@ -1,0 +1,76 @@
+:host { display: block; }
+
+.legal-page {
+  background: #ffffff;
+  min-height: 60vh;
+  padding: 56px 0 80px;
+
+  &__container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+  &__eyebrow { color: #5b8bff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin: 0 0 10px; }
+  &__title { font-size: 34px; font-weight: 800; color: #0f1428; margin: 0 0 14px; }
+  &__intro { font-size: 15px; line-height: 1.7; color: #4b5166; margin: 0 0 32px; }
+  &__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  &__saved { margin-top: 14px; font-size: 13px; font-weight: 600; color: #1a9c5b; }
+  &__section {
+    margin-top: 44px;
+    h2 { font-size: 20px; font-weight: 700; color: #0f1428; margin: 0 0 12px; }
+    p { font-size: 14.5px; line-height: 1.75; color: #4b5166; }
+  }
+}
+
+.cookie-cards { display: flex; flex-direction: column; gap: 14px; }
+
+.cookie-card {
+  border: 1px solid #e6e8f0;
+  border-radius: 14px;
+  padding: 20px 22px;
+  background: #fafbfe;
+
+  &__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+  &__title { font-size: 15.5px; font-weight: 700; color: #0f1428; margin: 0 0 6px; }
+  &__desc { font-size: 13.5px; line-height: 1.6; color: #6a7086; margin: 0; }
+  &__badge {
+    flex-shrink: 0; background: #e9f3ff; color: #2d6ae0; font-size: 12px; font-weight: 700;
+    padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+  }
+}
+
+.toggle {
+  flex-shrink: 0; width: 46px; height: 26px; border-radius: 999px; border: none;
+  background: #d7dbe6; position: relative; cursor: pointer; transition: background 0.2s ease;
+
+  &__knob {
+    position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+    background: #ffffff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); transition: transform 0.2s ease;
+  }
+
+  &--on {
+    background: #5b8bff;
+    .toggle__knob { transform: translateX(20px); }
+  }
+}
+
+.btn {
+  border: none; border-radius: 9px; padding: 12px 22px; font-size: 13.5px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s ease;
+
+  &--ghost { background: #f1f2f7; color: #2b2f3d; &:hover { background: #e6e8f0; } }
+  &--primary { background: #5b8bff; color: #ffffff; &:hover { background: #4477e8; } }
+}
+
+.cookie-table {
+  border: 1px solid #e6e8f0; border-radius: 12px; overflow: hidden;
+
+  &__row {
+    display: grid; grid-template-columns: 1.1fr 2fr 1fr; gap: 12px; padding: 13px 16px;
+    font-size: 13.5px; color: #3d4258; border-bottom: 1px solid #eef0f5;
+
+    &:last-child { border-bottom: none; }
+    &--head { background: #f7f8fb; font-weight: 700; color: #0f1428; }
+
+    @media (max-width: 560px) {
+      grid-template-columns: 1fr; gap: 4px;
+      span:first-child { font-weight: 700; }
+    }
+  }
+}

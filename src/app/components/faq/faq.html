@@ -1,0 +1,23 @@
+<div class="legal-page">
+  <div class="legal-page__container">
+    <p class="legal-page__eyebrow">{{ 'faq.eyebrow' | translate }}</p>
+    <h1 class="legal-page__title">{{ 'faq.pageTitle' | translate }}</h1>
+    <p class="legal-page__intro">{{ 'faq.pageIntro' | translate }}</p>
+
+    <div class="faq-list">
+      @for (item of items; track item.qKey; let i = $index) {
+        <div class="faq-item" [class.faq-item--open]="openIndex() === i">
+          <button type="button" class="faq-item__question" (click)="toggle(i)" [attr.aria-expanded]="openIndex() === i">
+            <span>{{ item.qKey | translate }}</span>
+            <span class="faq-item__icon">{{ openIndex() === i ? '−' : '+' }}</span>
+          </button>
+          @if (openIndex() === i) {
+            <div class="faq-item__answer">
+              <p>{{ item.aKey | translate }}</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
