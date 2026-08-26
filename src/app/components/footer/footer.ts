@@ -1,10 +1,11 @@
-  import { Component } from '@angular/core';
-  import { TranslatePipe } from "../../pipes/translate.pipe";
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { TranslatePipe } from "../../pipes/translate.pipe";
 
-  @Component({
-    selector: 'app-footer',
-    imports: [TranslatePipe],
-    templateUrl: './footer.html',
-    styleUrl: './footer.scss',
-  })
-  export class Footer {}
+@Component({
+  selector: 'app-footer',
+  imports: [TranslatePipe, RouterLink],
+  templateUrl: './footer.html',
+  styleUrl: './footer.scss',
+})
+export class Footer {}
