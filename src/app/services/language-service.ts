@@ -1,4 +1,4 @@
-import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID, REQUEST } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
@@ -48,26 +48,22 @@ export class LanguageService {
     this.isLoaded.set(true);
   }
 
-  private async loadLang(lang: LangCode): Promise<void> {
-    if (this.loadedLangs.has(lang)) {
-      return;
-    }
-    try {
-      const data = await firstValueFrom(
-        this.http.get<TranslationDict>(`/assets/i18n/${lang}.json`)
-      );
-      this.translations.update(current => ({
-        ...current,
-        [lang]: data
-      }));
+  private loadLang(lang: LangCode): Promise<void> {
+    if (this.loadedLangs.has(lang)) return Promise.resolve();
+
+    const baseUrl = isPlatformBrowser(this.platformId)
+      ? ''
+      : 'https://mycar-ge-frontend.onrender.com'; // production origin
+
+    return firstValueFrom(
+      this.http.get<TranslationDict>(`${baseUrl}/assets/i18n/${lang}.json`)
+    ).then(data => {
+      this.translations.update(current => ({ ...current, [lang]: data }));
       this.loadedLangs.add(lang);
-    } catch (err) {
+    }).catch(err => {
       console.error(`ვერ ჩაიტვირთა თარგმანების ფაილი: ${lang}`, err);
-      this.translations.update(current => ({
-        ...current,
-        [lang]: {}
-      }));
-    }
+      this.translations.update(current => ({ ...current, [lang]: {} }));
+    });
   }
 
   async setLang(lang: LangCode): Promise<void> {
